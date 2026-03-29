@@ -5,8 +5,8 @@
 
 #define uLCDH 120                            //用于图像显示的图像高度
 #define uLCDW 160                            //用于图像显示的图像宽度
-#define LCDH 60
-#define LCDW 80
+#define LCDH 60                              //图像高度
+#define LCDW 80                              //图像宽度
 #define HMAX (LCDH - 1)                      //没用
 #define WMAX (LCDW - 1)                      //没用
 #define LimitL(L) (L = ((L < 1) ? 1 : L))    //限制幅度
@@ -286,6 +286,7 @@ extern ImageStatustypedef ImageStatus;                //图像的全局变量
 extern SystemDatatypdef SystemData;
 extern uint8 length_max;
 extern ImageDealDatatypedef ImageDeal[60];                //记录单行的信息
+                                                          //DrawLinesFirst()中调用较多
 extern ImageFlagtypedef ImageFlag;
 extern ImageStatustypedef ImageData;             ///////需要修改的图像阈值参数
 extern uint16 exposure_time_self;

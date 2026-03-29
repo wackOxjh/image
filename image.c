@@ -14,9 +14,9 @@ static int IntervalLow = 0, IntervalHigh = 0;      //定义高低扫描区间
 static int ytemp = 0;                              //存放行
 static int TFSite = 0, FTSite = 0;                 //存放行
 static float DetR = 0, DetL = 0;                   //存放斜率
-static int BottomBorderRight = 79,                 //59行右边界
-BottomBorderLeft = 0,                              //59行左边界
-BottomCenter = 0;                                  //59行中点
+static int  BottomBorderRight = 79,                 //59行右边界
+            BottomBorderLeft = 0,                   //59行左边界
+            BottomCenter = 0;                       //59行中点
 ImageDealDatatypedef ImageDeal[60];                //记录单行的信息
 ImageStatustypedef ImageStatus;                    //图像的全局变量
 ImageStatustypedef ImageData;             ///////需要修改的图像阈值参数
@@ -545,7 +545,8 @@ void GetJumpPointFromDet(uint8* p,uint8 type,int L,int H,JumpPointtypedef* Q)  /
 
 /*用是从一帧图像底部开始，检测路面边线（左右赛道边界），并在 ImageDeal 数组里记录最近 5 行的边界信息。
 这是自动驾驶/循迹摄像头图像处理的“首次线标定”*/
-static uint8 DrawLinesFirst(void) {
+uint8 DrawLinesFirst(void) {
+//static uint8 DrawLinesFirst(void) {                   //去掉了static；未去则导致文件函数不能被链接
   PicTemp = Pixle[59];                                     //原本59  改成了57
   if (*(PicTemp + ImageSensorMid) == 0)                 //如果底边图像中点为黑，异常情况
   {
@@ -589,7 +590,7 @@ static uint8 DrawLinesFirst(void) {
       }
     }
   }
-  else                                                //左边线中点是白的，比较正常的情况
+  else//else语句，只执行当if语句不成立时的那一段                                  //左边线中点是白的，比较正常的情况
   {
     for (Xsite = 79; Xsite >ImageSensorMid; Xsite--)   //一个点一个点地搜索右边线
     {
@@ -623,13 +624,16 @@ static uint8 DrawLinesFirst(void) {
   ImageDeal[59].Wide = BottomBorderRight - BottomBorderLeft;  //存储宽度信息
   ImageDeal[59].IsLeftFind = 'T';
   ImageDeal[59].IsRightFind = 'T';
+                                                              //(57)上面是第59行（自定义的扫得第一根线），下面是 从下往上 确定底边5行。
+                                                              // 58
+                                                              // 59
   for (Ysite = 58; Ysite > 54; Ysite--)                       //由中间向两边确定底边五行
   {
     PicTemp = Pixle[Ysite];
     for (Xsite = 79; Xsite > ImageDeal[Ysite + 1].Center;Xsite--)                                             //和前面一样的搜索
     {
       if (*(PicTemp + Xsite) == 1 && *(PicTemp + Xsite - 1) == 1) {
-        ImageDeal[Ysite].RightBorder = Xsite;
+        ImageDeal[Ysite].RightBorder = Xsite;                                                               //此处是结构体ImageDealDatatypedef ImageDeal[60];//记录单行的信息
         break;
       } else if (Xsite == (ImageDeal[Ysite + 1].Center+1)) {
         ImageDeal[Ysite].RightBorder = ImageDeal[Ysite + 1].Center;
@@ -655,6 +659,15 @@ static uint8 DrawLinesFirst(void) {
   }
   return 'T';
 }                                                             //最基本的要求，最近的五行首先不会受到干扰，这需要在安装的时候调整摄像头的视角
+/*BottomBorderRight、BottomBorderLeft：先根据第 59 行搜边更新；用于算底行中点。
+BottomCenter：619 行赋值为 (BottomBorderLeft + BottomBorderRight) / 2。
+ImageDeal（image.h 里 extern ImageDeal[60]）：
+
+ImageDeal[59]：LeftBorder、RightBorder、Center、Wide、IsLeftFind、IsRightFind（620–625 行）。
+ImageDeal[58] … ImageDeal[55]：每行写入 RightBorder、LeftBorder、IsLeftFind、IsRightFind、Center、Wide（628–654 行）。
+只读、未写：Pixle 数组内容在此段不被改写，只读像素。*/
+
+
 
 /*从图像第55～OFFLine行（往上）逐行追踪左右赛道边线，
 完成整帧边线估计，包括“跳变修正”、“无边补线”和“上下层状态累积”。
