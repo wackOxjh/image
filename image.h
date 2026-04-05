@@ -3,21 +3,21 @@
 
 #include "zf_common_headfile.h"
 
-#define uLCDH 120                            //ÓÃÓÚÍ¼ÏñÏÔÊ¾µÄÍ¼Ïñ¸ß¶È
-#define uLCDW 160                            //ÓÃÓÚÍ¼ÏñÏÔÊ¾µÄÍ¼Ïñ¿í¶È
-#define LCDH 60                              //Í¼Ïñ¸ß¶È
-#define LCDW 80                              //Í¼Ïñ¿í¶È
-#define HMAX (LCDH - 1)                      //Ã»ÓÃ
-#define WMAX (LCDW - 1)                      //Ã»ÓÃ
-#define LimitL(L) (L = ((L < 1) ? 1 : L))    //ÏŞÖÆ·ù¶È
-#define LimitH(H) (H = ((H > 78) ? 78 : H))  //ÏŞÖÆ·ù¶È
-#define ImageSensorMid 39                    //Í¼ÏñÆÁÄ»ÖĞµã
-extern int ImageScanInterval;  //É¨±ß·¶Î§    ÉÏÒ»ĞĞµÄ±ß½ç+-ImageScanInterval
-extern int ImageScanInterval_Cross;  //Ê®×ÖÉ¨±ß·¶Î§
+#define uLCDH 120                            //ç”¨äºå›¾åƒæ˜¾ç¤ºçš„å›¾åƒé«˜åº¦
+#define uLCDW 160                            //ç”¨äºå›¾åƒæ˜¾ç¤ºçš„å›¾åƒå®½åº¦
+#define LCDH 60                              //å›¾åƒé«˜åº¦
+#define LCDW 80                              //å›¾åƒå®½åº¦
+#define HMAX (LCDH - 1)                      //æ²¡ç”¨
+#define WMAX (LCDW - 1)                      //æ²¡ç”¨
+#define LimitL(L) (L = ((L < 1) ? 1 : L))    //é™åˆ¶å¹…åº¦
+#define LimitH(H) (H = ((H > 78) ? 78 : H))  //é™åˆ¶å¹…åº¦
+#define ImageSensorMid 70                    //å›¾åƒå±å¹•ä¸­ç‚¹   39
+extern int ImageScanInterval;  //æ‰«è¾¹èŒƒå›´    ä¸Šä¸€è¡Œçš„è¾¹ç•Œ+-ImageScanInterval
+extern int ImageScanInterval_Cross;  //åå­—æ‰«è¾¹èŒƒå›´
 extern uint8 Image_Use[LCDH][LCDW];
 extern uint8 Pixle[LCDH][LCDW];
 extern uint8 UImage_Use[uLCDH][uLCDW];
-extern float variance;  //·½²î
+extern float variance;  //æ–¹å·®
 extern int ForkLinePointy;
 extern float variance_acc;
 extern int Fork_dowm;
@@ -39,133 +39,137 @@ typedef struct {
 } JumpPointtypedef;
 
 typedef struct {
-  float nowspeed;     // pulse±íÊ¾nowspeed
-  int expectspeed;    // speed±íÊ¾expectspeed
-  int motor_duty;     //µç»úÕ¼¿Õ±È
-  float Length;       //×ß¹ıÂ·³Ì
+  float nowspeed;     // pulseè¡¨ç¤ºnowspeed
+  int expectspeed;    // speedè¡¨ç¤ºexpectspeed
+  int motor_duty;     //ç”µæœºå ç©ºæ¯”
+  float Length;       //èµ°è¿‡è·¯ç¨‹
   int Circle_OUT_th;
-  int MinSpeed;             //×îµÍËÙ¶È
-  int MaxSpeed;             //×î¸ßËÙ¶È
-  float expect_True_speed;  //Êµ¼ÊÆÚÍûËÙ¶È
-  int straight_speed;       //Ö±µÀËÙ¶È
+  int MinSpeed;             //æœ€ä½é€Ÿåº¦
+  int MaxSpeed;             //æœ€é«˜é€Ÿåº¦
+  float expect_True_speed;  //å®é™…æœŸæœ›é€Ÿåº¦
+  int straight_speed;       //ç›´é“é€Ÿåº¦
 } SpeedDatatypedef;
 
 typedef struct {
-  /*×óÓÒ±ß±ß½ç±êÖ¾    TÎªÕı³£Ìø±ä±ß    WÎªÎŞ±ß   PÎªÕÏ°­Àà¶àÌø±ßµÄÄÚ±ß*/
-  uint8 IsRightFind;      //ÓÒ±ßÓĞ±ß±êÖ¾
-  uint8 IsLeftFind;       //×ó±ßÓĞ±ß±êÖ¾
-  uint8 isBlackFind;      //Èı²æ±ß
-  int Wide;               //±ß½ç¿í¶È
-  int LeftBorder;         //×ó±ß½ç
-  int RightBorder;        //ÓÒ±ß½ç
-  int close_LeftBorder;   //¿¿±ß±ß½ç
-  int close_RightBorder;  //¿¿±ß±ß½ç
-  int opp_LeftBorder;     //·´Ïò±ß½ç
-  int opp_RightBorder;    //·´Ïò±ß½ç
-  int Center;             //ÖĞÏß
-  int RightTemp;          //ÓÒ±ßÁÙÊ±Öµ
-  int LeftTemp;           //×ó±ßÁÙÊ±Öµ
-  int CenterTemp;         //ÖĞÏßÁÙÊ±Öµ
-  int Black_Point;        //µ¥ĞĞºÚµãÊıÁ¿
+  /*å·¦å³è¾¹è¾¹ç•Œæ ‡å¿—    Tä¸ºæ­£å¸¸è·³å˜è¾¹    Wä¸ºæ— è¾¹   Pä¸ºéšœç¢ç±»å¤šè·³è¾¹çš„å†…è¾¹*/
+  uint8 IsRightFind;      //å³è¾¹æœ‰è¾¹æ ‡å¿—
+  uint8 IsLeftFind;       //å·¦è¾¹æœ‰è¾¹æ ‡å¿—
+  uint8 isBlackFind;      //ä¸‰å‰è¾¹
+  int Wide;               //è¾¹ç•Œå®½åº¦
+  int LeftBorder;         //å·¦è¾¹ç•Œ
+  int RightBorder;        //å³è¾¹ç•Œ
+  int close_LeftBorder;   //é è¾¹è¾¹ç•Œ
+  int close_RightBorder;  //é è¾¹è¾¹ç•Œ
+  int opp_LeftBorder;     //åå‘è¾¹ç•Œ
+  int opp_RightBorder;    //åå‘è¾¹ç•Œ
+  int Center;             //ä¸­çº¿
+  int RightTemp;          //å³è¾¹ä¸´æ—¶å€¼
+  int LeftTemp;           //å·¦è¾¹ä¸´æ—¶å€¼
+  int CenterTemp;         //ä¸­çº¿ä¸´æ—¶å€¼
+  int Black_Point;        //å•è¡Œé»‘ç‚¹æ•°é‡
 
-  //×óÓÒÊÖ·¨ÔòÉ¨ÏßÊı¾İ
-  int LeftBoundary_First;  //×ó±ß½ç ±£´æµÚÒ»´ÎÊı¾İ
-  int RightBoundary_First; //ÓÒ±ß½ç ±£´æµÚÒ»´ÎÊı¾İ
-  int LeftBoundary;        //×ó±ß½ç ±£´æ×îºóÒ»´ÎÊı¾İ
-  int RightBoundary;       //ÓÒ±ß½ç ±£´æ×îºóÒ»´ÎÊı¾İ
+  //å·¦å³æ‰‹æ³•åˆ™æ‰«çº¿æ•°æ®
+  int LeftBoundary_First;  //å·¦è¾¹ç•Œ ä¿å­˜ç¬¬ä¸€æ¬¡æ•°æ®
+  int RightBoundary_First; //å³è¾¹ç•Œ ä¿å­˜ç¬¬ä¸€æ¬¡æ•°æ®
+  int LeftBoundary;        //å·¦è¾¹ç•Œ ä¿å­˜æœ€åä¸€æ¬¡æ•°æ®
+  int RightBoundary;       //å³è¾¹ç•Œ ä¿å­˜æœ€åä¸€æ¬¡æ•°æ®
 
-  // fork   ÏÂÃæµÄ±äÁ¿ÓÃÓÚ²íÂ·¿ÚµÄ¼ì²â
+  // fork   ä¸‹é¢çš„å˜é‡ç”¨äºå²”è·¯å£çš„æ£€æµ‹
 } ImageDealDatatypedef;
 
+/*è€ƒè™‘ç»“æ„ä½“æ•°ç»„èµ‹å€¼ï¼Œå…³äºç­‰äºå·çš„æ€è€ƒã€‚
+è¾¹ç•Œå€¼ä¸€èˆ¬åœ¨ 0~å®½åº¦ï¼ˆ255ï¼‰ ä¹‹é—´ï¼Œé‚£ä¹ˆintå‹å¯ä»¥ã€‚
+ä¸€è¾¹æ˜¯ç»“æ„ä½“ï¼Œä¸€è¾¹æ˜¯intå‹ã€‚
+*/
 
-//ÔªËØÀàĞÍ
+//å…ƒç´ ç±»å‹
 typedef enum {
-  Normol,       //ÎŞÈÎºÎÌØÕ÷
-  Straight,     ////Ö±µÀ
-  Cross,        ////Ê®×Ö
-  Ramp,         //ÆÂµÀ
-  LeftCirque,   ////×óÔ²»·
-  RightCirque,  ////ÓÒÔ²»·
-  Forkin,       //²íÂ·½ø¿Ú
-  Forkout,      //²íÂ·³ö¿Ú
-  Barn_out,     //³ö¿â
-  Barn_in,      //Èë¿â
+  Normol,       //æ— ä»»ä½•ç‰¹å¾
+  Straight,     ////ç›´é“
+  Cross,        ////åå­—
+  Ramp,         //å¡é“
+  LeftCirque,   ////å·¦åœ†ç¯
+  RightCirque,  ////å³åœ†ç¯
+  Forkin,       //å²”è·¯è¿›å£
+  Forkout,      //å²”è·¯å‡ºå£
+  Barn_out,     //å‡ºåº“
+  Barn_in,      //å…¥åº“
   Cross_ture,
 } RoadType_e;
 
 typedef struct {
-  /*ÒÔÏÂ¹ØÓÚÈ«¾ÖÍ¼ÏñÕı³£²ÎÊı*/
+  /*ä»¥ä¸‹å…³äºå…¨å±€å›¾åƒæ­£å¸¸å‚æ•°*/
 
-  //Í¼ÏñĞÅÏ¢
-  uint8 TowPoint;             //³õÊ¼±È½Ïµã           ¸ø¶¨Ç°Õ°
-  int TowPointAdjust_v;     //³õÊ¼±È½ÏµãÊÊÓ¦ËÙ¶È    Ã»ÓÃ
-  int TowPoint_True;        //Êµ¼Ê±È½Ïµã           Ã»ÓÃ
-  int TowPoint_Gain;        //ÔöÒæÏµÊı             Ã»ÓÃ
-  int TowPoint_Offset_Max;  //×î´óÆ«ÖÃÏµÊı         Ã»ÓÃ
-  int TowPoint_Offset_Min;  //×îĞ¡Æ«ÖÃÏµÊı         Ã»ÓÃ
-  int Det_True;             //ÓÉGetDet()º¯Êı½âËã³öÀ´µÄÆ½¾ùÍ¼ÏñÆ«²î
-  int Det_all;              //Í¼ÏñµÄ½ü¶Ëµ½Ô¶¶ËµÄ×ÜÆ«²î
-  float Det_all_k;          //Ğ±ÂÊ
+  //å›¾åƒä¿¡æ¯
+  uint8 TowPoint;             //åˆå§‹æ¯”è¾ƒç‚¹           ç»™å®šå‰ç»
+  int TowPointAdjust_v;     //åˆå§‹æ¯”è¾ƒç‚¹é€‚åº”é€Ÿåº¦    æ²¡ç”¨
+  int TowPoint_True;        //å®é™…æ¯”è¾ƒç‚¹           æ²¡ç”¨
+  int TowPoint_Gain;        //å¢ç›Šç³»æ•°             æ²¡ç”¨
+  int TowPoint_Offset_Max;  //æœ€å¤§åç½®ç³»æ•°         æ²¡ç”¨
+  int TowPoint_Offset_Min;  //æœ€å°åç½®ç³»æ•°         æ²¡ç”¨
+  int Det_True;             //ç”±GetDet()å‡½æ•°è§£ç®—å‡ºæ¥çš„å¹³å‡å›¾åƒåå·®
+  int Det_all;              //å›¾åƒçš„è¿‘ç«¯åˆ°è¿œç«¯çš„æ€»åå·®
+  float Det_all_k;          //æ–œç‡
 
-  uint8 Threshold;          //¶şÖµ»¯ãĞÖµ
-  uint32 Threshold_static;  //¶şÖµ»¯¾²Ì¬ÏÂÏŞ
-  uint8 Threshold_detach;   //Ñô¹âËã·¨·Ö¸îãĞÖµ
-  uint8 MiddleLine;         //ÆÁÄ»ÖĞĞÄ
-  int Foresight;            //Æ«²îËÙ¶ÈÒò×Ó   Ô¶¶ËµÄÆ«²î  ÓÃÓÚ¿ØËÙ
-  uint8 Left_Line;          //×ó±ß¶ª±ßÊı
-  uint8 Right_Line;         //ÓÒ±ß¶ª±ßÊı
-  uint8 OFFLine;            /////Í¼Ïñ¶¥±ß
-  uint8 WhiteLine;          ////Ë«±ß¶ª±ßÊı
-  float ExpectCur;          /////Í¼ÏñÆÚÍûÇúÂÊ    Ã»ÓÃ
-  float White_Ritio;        //ÓĞĞ§ĞĞ°×µã±ÈÀı     Ã»ÓÃ
-  int Black_Pro_ALL;        //ÕûÌåºÚµã±ÈÀı%      Ã»ÓÃ
+  uint8 Threshold;          //äºŒå€¼åŒ–é˜ˆå€¼
+  uint32 Threshold_static;  //äºŒå€¼åŒ–é™æ€ä¸‹é™
+  uint8 Threshold_detach;   //é˜³å…‰ç®—æ³•åˆ†å‰²é˜ˆå€¼
+  uint8 MiddleLine;         //å±å¹•ä¸­å¿ƒ
+  int Foresight;            //åå·®é€Ÿåº¦å› å­   è¿œç«¯çš„åå·®  ç”¨äºæ§é€Ÿ
+  uint8 Left_Line;          //å·¦è¾¹ä¸¢è¾¹æ•°
+  uint8 Right_Line;         //å³è¾¹ä¸¢è¾¹æ•°
+  uint8 OFFLine;            /////å›¾åƒé¡¶è¾¹
+  uint8 WhiteLine;          ////åŒè¾¹ä¸¢è¾¹æ•°
+  float ExpectCur;          /////å›¾åƒæœŸæœ›æ›²ç‡    æ²¡ç”¨
+  float White_Ritio;        //æœ‰æ•ˆè¡Œç™½ç‚¹æ¯”ä¾‹     æ²¡ç”¨
+  int Black_Pro_ALL;        //æ•´ä½“é»‘ç‚¹æ¯”ä¾‹%      æ²¡ç”¨
 
   // PID
-  float Piriod_P;  //·Ö¶ÎP   Öµ     Ã»ÓÃ
+  float Piriod_P;  //åˆ†æ®µP   å€¼     æ²¡ç”¨
   float MU_P;
 
-  RoadType_e Road_type;  //ÔªËØÀàĞÍ
+  RoadType_e Road_type;  //å…ƒç´ ç±»å‹
 
-  /****Ô²»·***/
-  uint8 IsCinqueOutIn;  //½ø³öÔ²»·
-  uint8 CirquePass;     //Ô²»·ÖĞ
-  uint8 CirqueOut;      //³öÔ²»·
-  uint8 CirqueOff;      //Ô²»·½áÊø
+  /****åœ†ç¯***/
+  uint8 IsCinqueOutIn;  //è¿›å‡ºåœ†ç¯
+  uint8 CirquePass;     //åœ†ç¯ä¸­
+  uint8 CirqueOut;      //å‡ºåœ†ç¯
+  uint8 CirqueOff;      //åœ†ç¯ç»“æŸ
 
-  //×óÓÒÊÖ·¨ÔòÉ¨ÏßÊı¾İ
+  //å·¦å³æ‰‹æ³•åˆ™æ‰«çº¿æ•°æ®
 
-  int16 WhiteLine_L;        //×ó±ß¶ªÏßÊı
-  int16 WhiteLine_R;        //ÓÒ±ß¶ªÏßÊı
-  int16 OFFLineBoundary;   //°ËÁìÓò½ØÖ¹ĞĞ
+  int16 WhiteLine_L;        //å·¦è¾¹ä¸¢çº¿æ•°
+  int16 WhiteLine_R;        //å³è¾¹ä¸¢çº¿æ•°
+  int16 OFFLineBoundary;   //å…«é¢†åŸŸæˆªæ­¢è¡Œ
 
-  int Pass_Lenth;       //Èë»·¾àÀë  ÓÃÓÚ·À¶¶
-                        /****Ô²»·***/
+  int Pass_Lenth;       //å…¥ç¯è·ç¦»  ç”¨äºé˜²æŠ–
+                        /****åœ†ç¯***/
   int Cirque1lenth;        //tly1
   int Cirque2lenth;        //tly2
   int Out_Lenth;     //
-  int Fork_Out_Len;  //³ö²í¿Ú·À¶¶
-  int Dowm_lenth;    //Èı²æ¼õËÙ¾àÀë  //g5.13
-  int Cross_Lenth;  // 270¡ã×ª¹ıÖ®ºóÒ»°ãÊÇÊ®×ÖÂ·¿Ú   ×÷ÎªÈı²í¿ÚµÄÏû¶¶
+  int Fork_Out_Len;  //å‡ºå²”å£é˜²æŠ–
+  int Dowm_lenth;    //ä¸‰å‰å‡é€Ÿè·ç¦»  //g5.13
+  int Cross_Lenth;  // 270Â°è½¬è¿‡ä¹‹åä¸€èˆ¬æ˜¯åå­—è·¯å£   ä½œä¸ºä¸‰å²”å£çš„æ¶ˆæŠ–
   int Cross_ture_lenth;
-  int Sita;  //¾İ´ËÅĞ¶ÏÔÚ¹ıÈ¥Ò»¶ÎÂ·³ÌÖĞ×ª¹ı¶àÉÙ½Ç¶È
+  int Sita;  //æ®æ­¤åˆ¤æ–­åœ¨è¿‡å»ä¸€æ®µè·¯ç¨‹ä¸­è½¬è¿‡å¤šå°‘è§’åº¦
   int pansancha_Lenth;
 
-  //³µ¿â
-  int Barn_Flag;   //ÅĞ¶Ï¿âµÄ´ÎÊı
-  int Barn_Lenth;  //Èë¿âÍ£Ö¹¾àÀë
+  //è½¦åº“
+  int Barn_Flag;   //åˆ¤æ–­åº“çš„æ¬¡æ•°
+  int Barn_Lenth;  //å…¥åº“åœæ­¢è·ç¦»
   int sanchaju;
 
-  //±£»¤
-  int Stop_lenth;  //³ö½ç±£»¤·ÅÎóÅĞ¾àÀë
-  //ÆÂµÀ¼õËÙ
+  //ä¿æŠ¤
+  int Stop_lenth;  //å‡ºç•Œä¿æŠ¤æ”¾è¯¯åˆ¤è·ç¦»
+  //å¡é“å‡é€Ÿ
   int Ramp_lenth;
 
-  int variance;  //Ö±µÀ¼ì²âãĞÖµ·½²î
+  int variance;  //ç›´é“æ£€æµ‹é˜ˆå€¼æ–¹å·®
 
-  int straight_acc;  //Ö±µÀ¼ÓËÙ±êÖ¾Î»
-  int  variance_acc;    //ÓÃÓÚ¼ÓËÙµÄãĞÖµ·½²î
+  int straight_acc;  //ç›´é“åŠ é€Ÿæ ‡å¿—ä½
+  int  variance_acc;    //ç”¨äºåŠ é€Ÿçš„é˜ˆå€¼æ–¹å·®
 
-  int ramptestlenth;//ÆÂµÀ¼ì²â¼ä¸ô
+  int ramptestlenth;//å¡é“æ£€æµ‹é—´éš”
 
   int rukuwait_lenth;
   int rukuwait_flag;
@@ -176,124 +180,124 @@ typedef struct {
 
 typedef struct{
 
-  uint8 SteerOK;      //¶æ»úÆô¶¯±êÖ¾
-  uint8 CameraOK;     //ÉãÏñÍ·Æô¶¯ÏÔÊ¾±êÖ¾
-  uint8 OldCameraOK;  //»Ò¶È´«Êä±êÖ¾
-  uint8 MotorOK;      //µç»ú¿ª¹Ø
-  uint8 Point;        //ÈüµÀÊµ¼ÊÖĞĞÄ
-  uint8 UpdataOK;     //Êı¾İ¸üĞÂ
-  uint8 Stop;         //Í£Ö¹±êÖ¾
-  uint8 GO_OK;        //³å³å³å
-  int Model;          //³µÁ¾Ä£Ê½
+  uint8 SteerOK;      //èˆµæœºå¯åŠ¨æ ‡å¿—
+  uint8 CameraOK;     //æ‘„åƒå¤´å¯åŠ¨æ˜¾ç¤ºæ ‡å¿—
+  uint8 OldCameraOK;  //ç°åº¦ä¼ è¾“æ ‡å¿—
+  uint8 MotorOK;      //ç”µæœºå¼€å…³
+  uint8 Point;        //èµ›é“å®é™…ä¸­å¿ƒ
+  uint8 UpdataOK;     //æ•°æ®æ›´æ–°
+  uint8 Stop;         //åœæ­¢æ ‡å¿—
+  uint8 GO_OK;        //å†²å†²å†²
+  int Model;          //è½¦è¾†æ¨¡å¼
 
-  //Í¼Ïñ²ÎÊı
-  int OutCicle_line;  //³ö»·ÅĞ¶ÏÍ¼Ïñ½ØÖ¹ĞĞ  Ô½´ó³ö»·ÅĞ¶ÏÔ½ÑÏ¸ñÔ½Íí
-  int L_T_R_W;  // ³ö»·×óÓĞ±ßÓÒÎŞ±ßÊıÁ¿  Ô½´ó³ö»·½áÊøÔ½ÑÏ¸ñ
-  int Circleoff_offline;  //¿´µ½Ô¶´¦µÄ¾àÀëÅĞ¶Ï³ö»·½áÊø  Ô½Ğ¡Ô½ÑÏ¸ñ
-  int CircleP;            //»·ÄÚP
+  //å›¾åƒå‚æ•°
+  int OutCicle_line;  //å‡ºç¯åˆ¤æ–­å›¾åƒæˆªæ­¢è¡Œ  è¶Šå¤§å‡ºç¯åˆ¤æ–­è¶Šä¸¥æ ¼è¶Šæ™š
+  int L_T_R_W;  // å‡ºç¯å·¦æœ‰è¾¹å³æ— è¾¹æ•°é‡  è¶Šå¤§å‡ºç¯ç»“æŸè¶Šä¸¥æ ¼
+  int Circleoff_offline;  //çœ‹åˆ°è¿œå¤„çš„è·ç¦»åˆ¤æ–­å‡ºç¯ç»“æŸ  è¶Šå°è¶Šä¸¥æ ¼
+  int CircleP;            //ç¯å†…P
 
 
-//·ÀÎóÅĞ¾àÀë
-  int fork_start_lenth;  //²íÂ·¿Ú¼ì²âÆğÊ¼
-  int fork_off_lenth;//²íÂ·¿Ú¼ì²â½ØÖ¹
+//é˜²è¯¯åˆ¤è·ç¦»
+  int fork_start_lenth;  //å²”è·¯å£æ£€æµ‹èµ·å§‹
+  int fork_off_lenth;//å²”è·¯å£æ£€æµ‹æˆªæ­¢
 
-  int circle_off_lenth;//³ö»··ÀÎóÅĞ¾àÀë
+  int circle_off_lenth;//å‡ºç¯é˜²è¯¯åˆ¤è·ç¦»
 
-  //Ğ¡Ô²»·
+  //å°åœ†ç¯
   int circles_pl;
   int circles_pr;
-  int circles_off_lenth;//Ğ¡Ô²»·³ö»··ÀÎóÅĞ¾àÀë
+  int circles_off_lenth;//å°åœ†ç¯å‡ºç¯é˜²è¯¯åˆ¤è·ç¦»
 
-   //ÖĞÔ²»·
+   //ä¸­åœ†ç¯
   int circlem_pl;
   int circlem_pr;
-  int circlem_off_lenth;//Ğ¡Ô²»·³ö»··ÀÎóÅĞ¾àÀë
+  int circlem_off_lenth;//å°åœ†ç¯å‡ºç¯é˜²è¯¯åˆ¤è·ç¦»
 
-   //´óÔ²»·
+   //å¤§åœ†ç¯
   int circlel_pl;
   int circlel_pr;
-  int circlel_off_lenth;//Ğ¡Ô²»·³ö»··ÀÎóÅĞ¾àÀë
-  int clrcle_priority[3];//Ô²»·ÀàĞÍ
-  int clrcle_num;// ÔÚµÚ¼¸¸öÔ²»·
+  int circlel_off_lenth;//å°åœ†ç¯å‡ºç¯é˜²è¯¯åˆ¤è·ç¦»
+  int clrcle_priority[3];//åœ†ç¯ç±»å‹
+  int clrcle_num;// åœ¨ç¬¬å‡ ä¸ªåœ†ç¯
 
 
-  int circle_kin;//Èë»·²¹Ïß°ë¾¶
-  float circle_kout;//³ö»·²¹ÏßĞ±ÂÊ
-  int circle_max_ang;//»·ÄÚ´ó½ĞÏŞ·ù
+  int circle_kin;//å…¥ç¯è¡¥çº¿åŠå¾„
+  float circle_kout;//å‡ºç¯è¡¥çº¿æ–œç‡
+  int circle_max_ang;//ç¯å†…å¤§å«é™å¹…
 
 
-  //Ö±µÀ
-  float straight_p;//Ö±µÀP
-  float straight_d;//Ö±µÀD
-  int   straighet_towpoint;//Ö±µÀÇ°Õ°
+  //ç›´é“
+  float straight_p;//ç›´é“P
+  float straight_d;//ç›´é“D
+  int   straighet_towpoint;//ç›´é“å‰ç»
 
 
-  int debug_lenth;//µ÷ÊÔ¾àÀë
+  int debug_lenth;//è°ƒè¯•è·ç¦»
 
-  //ÉãÏñÍ·ÅäÖÃ
-  int exp_time; //ÆØ¹âÊ±¼ä
-  int mtv_lroffset;//ÉãÏñÍ·×óÓÒÆ«ÖÃ
-  int mtv_gain;//ÉãÏñÍ·ÔöÒæ
+  //æ‘„åƒå¤´é…ç½®
+  int exp_time; //æ›å…‰æ—¶é—´
+  int mtv_lroffset;//æ‘„åƒå¤´å·¦å³åç½®
+  int mtv_gain;//æ‘„åƒå¤´å¢ç›Š
 
-  int ramp_lenth_start;//ÆÂµÀ¾àÀë
-  int fork_lenth_start;//Èı²æ¾àÀë
-  int barn_lenth;//Ô²»·¾àÀë
+  int ramp_lenth_start;//å¡é“è·ç¦»
+  int fork_lenth_start;//ä¸‰å‰è·ç¦»
+  int barn_lenth;//åœ†ç¯è·ç¦»
 
-  int outbent_acc;//³öÍä¼ÓËÙ
+  int outbent_acc;//å‡ºå¼¯åŠ é€Ÿ
 
 
-  int rounds; // È¦Êı
-  int speed_per_round; // Ã¿È¦¼õËÙ¶àÉÙ
+  int rounds; // åœˆæ•°
+  int speed_per_round; // æ¯åœˆå‡é€Ÿå¤šå°‘
 
   SpeedDatatypedef SpeedData;
 } SystemDatatypdef;
 
 typedef struct {
-//    int16 Bend_Road;                            /*0 :ÎŞ               1 :ÓÒÍäµÀ     2 :×óÍäµÀ*/
-    int16 image_element_rings;                  /*0 :ÎŞÔ²»·          1 :×óÔ²»·       2 :ÓÒÔ²»·*/
-    int16 ring_big_small;                       /*0:ÎŞ                     1 :´óÔ²»·       2 :Ğ¡Ô²»·*/
-    int16 image_element_rings_flag;             /*Ô²»·½ø³Ì*/
-    int16 straight_long;                        /*³¤Ö±µÀ±êÖ¾Î»*/
-//    int16 Garage_Location;                      /*0 :ÎŞ³µ¿â          1 :×ó³µ¿â       2 :ÓÒ³µ¿â*/
-//    int16 Zebra_Flag;                           /*0 :ÎŞ°ßÂíÏß       1 ×ó³µ¿â       2 :ÓÒ³µ¿â*/
-//    int16 Ramp;                                  /*0 :ÎŞÆÂµÀ          1£ºÆÂµÀ*/
-//    int16 RoadBlock_Flag;                        /*0 :ÎŞÂ·ÕÏ            1 :Â·ÕÏ*/
-//    int16 Out_Road;                               /*0 :ÎŞ¶ÏÂ·      1 :¶ÏÂ·*/
+//    int16 Bend_Road;                            /*0 :æ—                1 :å³å¼¯é“     2 :å·¦å¼¯é“*/
+    int16 image_element_rings;                  /*0 :æ— åœ†ç¯          1 :å·¦åœ†ç¯       2 :å³åœ†ç¯*/
+    int16 ring_big_small;                       /*0:æ—                      1 :å¤§åœ†ç¯       2 :å°åœ†ç¯*/
+    int16 image_element_rings_flag;             /*åœ†ç¯è¿›ç¨‹*/
+    int16 straight_long;                        /*é•¿ç›´é“æ ‡å¿—ä½*/
+//    int16 Garage_Location;                      /*0 :æ— è½¦åº“          1 :å·¦è½¦åº“       2 :å³è½¦åº“*/
+//    int16 Zebra_Flag;                           /*0 :æ— æ–‘é©¬çº¿       1 å·¦è½¦åº“       2 :å³è½¦åº“*/
+//    int16 Ramp;                                  /*0 :æ— å¡é“          1ï¼šå¡é“*/
+//    int16 RoadBlock_Flag;                        /*0 :æ— è·¯éšœ            1 :è·¯éšœ*/
+//    int16 Out_Road;                               /*0 :æ— æ–­è·¯      1 :æ–­è·¯*/
 } ImageFlagtypedef;
-void camera_display(void);  //Í¼ÏñÏÔÊ¾
-void compressimage();       ////Ñ¹ËõÍ¼Ïñ
-void Get01change();         ////¶şÖµ»¯Í¼Ïñ
-void Pixle_Filter();        ////ÏñËØÂË²¨£¬Ğ§¹û²»´ó
-void Draw_Road(void);       ///»æÖÆÈüµÀ±ß½ç
-void ImageProcess(void);    ////Í¼Ïñ´¦ÀíÖ÷º¯Êı
-void uncompressimage();     //Í¼Ïñ½âÑ¹
-//void ForkTest();            //²íÂ·¿Ú¼ì²â
-void Cross_Test();          //Ô²»·¼ì²â
-void Cross_Handle();        //Ô²»·´¦Àí
-void Element_Test();        //ÔªËØ¼ì²â
-void Ramp_Test();           //ÆÂµÀ¼ì²â
-void Barn_test_in();        //Èë¿â¼ì²â
+void camera_display(void);  //å›¾åƒæ˜¾ç¤º
+void compressimage();       ////å‹ç¼©å›¾åƒ
+void Get01change();         ////äºŒå€¼åŒ–å›¾åƒ
+void Pixle_Filter();        ////åƒç´ æ»¤æ³¢ï¼Œæ•ˆæœä¸å¤§
+void Draw_Road(void);       ///ç»˜åˆ¶èµ›é“è¾¹ç•Œ
+void ImageProcess(void);    ////å›¾åƒå¤„ç†ä¸»å‡½æ•°
+void uncompressimage();     //å›¾åƒè§£å‹
+//void ForkTest();            //å²”è·¯å£æ£€æµ‹
+void Cross_Test();          //åœ†ç¯æ£€æµ‹
+void Cross_Handle();        //åœ†ç¯å¤„ç†
+void Element_Test();        //å…ƒç´ æ£€æµ‹
+void Ramp_Test();           //å¡é“æ£€æµ‹
+void Barn_test_in();        //å…¥åº“æ£€æµ‹
 float Straight_Judge_two(uint8 flag);
-void Element_Handle();      //ÔªËØ´¦Àí
-uint8 len(uint8 x);         //¼ÆËãÒ»ÁĞ³¤¶È
-uint8 len_maxget(void);     //¼ÆËã20-60ÁĞ³¤¶È
-//void Fork_Handle();         //Èı²æ´¦Àí
-//void Barn_in_Handle();      //Ã»ÓÃ
-//void GetLenSita();          //Ã»ÓÃÁË
+void Element_Handle();      //å…ƒç´ å¤„ç†
+uint8 len(uint8 x);         //è®¡ç®—ä¸€åˆ—é•¿åº¦
+uint8 len_maxget(void);     //è®¡ç®—20-60åˆ—é•¿åº¦
+//void Fork_Handle();         //ä¸‰å‰å¤„ç†
+//void Barn_in_Handle();      //æ²¡ç”¨
+//void GetLenSita();          //æ²¡ç”¨äº†
 //void Pcir_Handle(void);
 int Limit(int num, int numH, int numL);
-extern ImageStatustypedef ImageStatus;                //Í¼ÏñµÄÈ«¾Ö±äÁ¿
+extern ImageStatustypedef ImageStatus;                //å›¾åƒçš„å…¨å±€å˜é‡
 extern SystemDatatypdef SystemData;
 extern uint8 length_max;
-extern ImageDealDatatypedef ImageDeal[60];                //¼ÇÂ¼µ¥ĞĞµÄĞÅÏ¢
-                                                          //DrawLinesFirst()ÖĞµ÷ÓÃ½Ï¶à
+extern ImageDealDatatypedef ImageDeal[60];                //è®°å½•å•è¡Œçš„ä¿¡æ¯
+                                                          //DrawLinesFirst()ä¸­è°ƒç”¨è¾ƒå¤š
 extern ImageFlagtypedef ImageFlag;
-extern ImageStatustypedef ImageData;             ///////ĞèÒªĞŞ¸ÄµÄÍ¼ÏñãĞÖµ²ÎÊı
+extern ImageStatustypedef ImageData;             ///////éœ€è¦ä¿®æ”¹çš„å›¾åƒé˜ˆå€¼å‚æ•°
 extern uint16 exposure_time_self;
 
 extern uint8  banmaxian_on;
 
-extern uint8 Var_speed_start;//»º³åÆğ²½Ïà¹Ø
+extern uint8 Var_speed_start;//ç¼“å†²èµ·æ­¥ç›¸å…³
 extern uint16 Speed_Goal_max;
 extern uint16 Speed_Goal_min;
 

@@ -151,7 +151,7 @@
 
 
 
-//***************************************
+//**********************************************************************************************************************
 
 
 
@@ -249,3 +249,333 @@
 4. 统计左右“白线”计数到 `ImageStatus.WhiteLine_L/R`
 
 > 所以，`Search_Border_OTSU` 没有直接返回数据，而是 “写入” 全局结构 `ImageDeal[]` 和 `ImageStatus`，也会修改 `imageInput` 边界像素。
+
+
+
+/********************************************************************************************************************************
+
+
+在 `image.c` 里，“中线”主要体现在 **`ImageDeal[行].Center`**（赛道在每一列上的中心列坐标）。它不是单独用阈值扫出来的一条线，而是**先找左右边线，再几何合成**；后面再滤波、元素补线，最后给控制用。下面按**处理流水线**和**代码块**说明。
+
+---
+
+## 1. 主链路：由左右边界算中线（最核心）
+
+- **`DrawLinesFirst`**（约 619–655 行）：最底几行上，  
+  `BottomCenter = (BottomBorderLeft + BottomBorderRight) / 2`，写入 `ImageDeal[59].Center`，并在 58～55 行用左右边再算 `Center`。
+- **`DrawLinesProcess`**（约 873–874 行）：从第 55 行往上巡边后，每行  
+  `Center = (RightBorder + LeftBorder) / 2`，`Wide = RightBorder - LeftBorder`。
+- **`DrawExtensionLine`**（约 999–1001 行）：对左右边界做延长补线之后，**整段从 `OFFLine` 到 59 行重新**  
+  `Center = (LeftBorder + RightBorder) / 2` 并更新 `Wide`。  
+  注释里写明：**“重新确定中线”**。
+
+思路：**中线 = 当前行左右赛道边界的列坐标中点**，这是全文件里最常见、最基的定义。
+
+---
+
+## 2. 对“中线序列”做平滑 / 修补
+
+- **`RouteFilter`**（约 1262–1294 行）：注释为**“出现丢边的时候重新确定无边行的中线”**。  
+  - 若连续行左右都是丢边 `'W'`，会向**更近的、左右都正常**的行取参考，用 `Center` 的斜率**外推**填补中间行的 `Center`。  
+  - 最后对每行做  
+    `Center = (上一行 Center + 2×本行 Center) / 3`，**减轻抖动**。  
+主流程里在 `Image_Handle` 一类总入口中紧跟在 `DrawExtensionLine()` 之后调用（约 2991–2992 行），属于**后处理平滑**。
+
+---
+
+## 3. 拟合：用最小二乘把一段 `Center` 拉成直线
+
+- **`Fit1(int start, int num)`**（约 213–241 行）：对多行的 **`ImageDeal[...].Center`** 做最小二乘直线拟合，再用 **`a*i+b` 写回**这些行的 `Center`，相当于把中线拉直、去局部噪声。  
+- **`Fit1_k`**（约 260–295 行）：同样用 `Center` 拟合，但主要用来**算斜率 k** 返回值，不直接批量改写 `ImageDeal.Center`（中间结果在局部数组里）。
+
+当前工程里 **`Fit1(59,50)`** 在 **`Pcir_Handle`** 的十字第二圈左补线分支里调用（约 2739–2746 行）：先按右边界和补线宽度改 `Center`/`LeftBorder`，再 **`Fit1` 平滑一段**。
+
+---
+
+## 4. 元素/特殊路况：改的是“怎么算中线”，不是另起一个检测器
+
+在 **`Element_Handle`** 及相关系列函数里（你 grep 会看到大量 `ImageDeal[Ysite].Center = ...`），典型做法是：
+
+- 只有**单边**可靠时，用 **`Half_Road_Wide`** 等预设路宽，从**左或右边界平移**得到 `Center`；  
+- 或仍用 **`(Left + Right) / 2`**，再 **限幅**（如 `Center<4` clamp 到 4）；  
+- 例如 **`Pcir_Handle`** 里十字场景用 `RightBorder - buxianwide*0.5` 定 `Center`（约 2741–2744 行）。
+
+这些是**规则层**在特定 `Road_type` 下**重写或修正**几何中线，与前面的通用 `(L+R)/2` 互补。
+
+---
+
+## 5. 不算“找中线”，但和中线强相关
+
+- **`GetDet`**（约 2837–2908 行）：根据车速、路况选前瞻行 **`TowPoint`**，对多行 **`ImageDeal[Ysite].Center` 加权平均**得到 **`ImageStatus.Det_True`**，给转向/偏差用。这里是在**消费**已有中线，而不是首次检测。
+- **`DrawLine`**（约 2826–2833 行）：把 `Center`（及左右边）画进 `Pixle` 方便看图，调试用。
+- **`ImageStatus.MiddleLine`**（头文件里为“屏幕中线”类参考）：在别处用于以屏幕中心为参考的扫描/统计（如你文件里 1339 行附近），和 **`ImageDeal[].Center`（赛道中心）** 概念不同，不要混成一个量。
+
+---
+
+## 小结（一句话）
+
+**“找中线”的主体代码**就是：**`DrawLinesFirst` / `DrawLinesProcess` / `DrawExtensionLine` 里用左右边算 `ImageDeal[].Center`，再由 `RouteFilter`、`Fit1`、各 **`Element_*` / `Pcir_Handle`** 分支按路况修补或拟合**；**`GetDet`** 再用这条中线序列算控制偏差。
+
+若你希望，我可以按 **`Element_Handle` 里每一个 `Road_type`** 把“何时改用 `(L+R)/2`、何时用单边+路宽”再列一张对照表（需要再扫那一段巨函数）。
+
+
+
+
+
+/****************************************************************************************************************************
+
+我已经读过这段代码，直接开始详细讲解。
+
+---
+
+# `DrawLinesProcess` 函数详解（670–890 行）
+
+## 先说"背景"——这个函数在做什么
+
+想象一辆小车在赛道上跑，摄像头拍下一张 **60行 × 80列** 的黑白图像。赛道是白色的，边线（赛道内侧的黑色边界）是黑色的。
+
+前面 `DrawLinesFirst()` 已经把**最近 5 行（第 55～59 行，也就是离车最近的部分）**的左右边界确定好了。
+
+现在这个函数要做的事就是：**"从第 55 行开始，一行一行往上找，把整张图的左右边界都确定出来"**，就像攀岩一样，脚踩着已知的点往上爬。
+
+---
+
+## 第一部分：准备工作（678–690 行）
+
+```677:690:c:\Users\Admin\Desktop\image\image.c
+{
+  uint8 L_Found_T = 'F';
+  uint8 Get_L_line = 'F';
+  uint8 R_Found_T = 'F';
+  uint8 Get_R_line = 'F';
+  float D_L = 0;
+  float D_R = 0;
+  int ytemp_W_L;
+  int ytemp_W_R;
+  ExtenRFlag = 0;
+  ExtenLFlag = 0;
+   ImageStatus.Left_Line = 0;
+   ImageStatus.WhiteLine = 0;
+   ImageStatus.Right_Line = 0;
+```
+
+把一堆"记事本"初始化：
+- `L_Found_T` / `R_Found_T`：**"有没有找到用来推算的基准斜率"**，初始"没有"（`'F'`）。
+- `D_L` / `D_R`：左右边线的**斜率**，用来后面"画延长线"。
+- `ExtenLFlag` / `ExtenRFlag`：延长线开关，清零。
+- `Left_Line` / `Right_Line` / `WhiteLine`：本帧里**左边没找到、右边没找到、两边都没找到**的行数，清零重新统计。
+
+---
+
+## 第二部分：主循环——逐行向上追踪（691–713 行）
+
+```691:713:c:\Users\Admin\Desktop\image\image.c
+  for (Ysite = 54 ; Ysite > ImageStatus.OFFLine; Ysite--)
+  {
+        PicTemp = Pixle[Ysite];
+        JumpPointtypedef JumpPoint[2];
+        if (ImageStatus.Road_type != Cross_ture) {
+                IntervalLow =ImageDeal[Ysite + 1].RightBorder -ImageScanInterval;
+                IntervalHigh =ImageDeal[Ysite + 1].RightBorder + ImageScanInterval;
+        } else {
+            IntervalLow =ImageDeal[Ysite + 1].RightBorder -ImageScanInterval_Cross;
+            IntervalHigh = ImageDeal[Ysite + 1].RightBorder + ImageScanInterval_Cross;
+        }
+        LimitL(IntervalLow);
+        LimitH(IntervalHigh);
+        GetJumpPointFromDet(PicTemp, 'R', IntervalLow, IntervalHigh,&JumpPoint[1]);
+        IntervalLow =ImageDeal[Ysite + 1].LeftBorder -ImageScanInterval;
+        IntervalHigh =ImageDeal[Ysite + 1].LeftBorder +ImageScanInterval;
+        LimitL(IntervalLow);
+        LimitH(IntervalHigh);
+        GetJumpPointFromDet(PicTemp, 'L', IntervalLow, IntervalHigh,&JumpPoint[0]);
+```
+
+**通俗理解**：
+
+- 从第 54 行开始，一行一行往上（`Ysite--`），到 `OFFLine` 停（太远的不稳定，不处理）。
+- 每行取这行的像素 `PicTemp = Pixle[Ysite]`。
+- **不是整行扫，而是"开小窗口"**：以**上一行已知边界**为中心，左右各开 `ImageScanInterval`（几个像素的宽度）的范围，在这个小窗里找跳变点。
+- 如果是十字路口，窗口开得更大（`ImageScanInterval_Cross`），因为十字处边线变化幅度更大。
+- `LimitL` / `LimitH` 是限幅，防止窗口超出图像边界（0～79 列）。
+- `GetJumpPointFromDet` 就是**在小窗口里找黑白跳变点**，结果写进 `JumpPoint[0]`（左）和 `JumpPoint[1]`（右）。
+
+**比喻**：就像你闭着眼走路，只在脚边左右摸索，而不是把整条路都摸一遍——既快又准。
+
+---
+
+## 第三部分：把结果写进去（715–730 行）
+
+```715:730:c:\Users\Admin\Desktop\image\image.c
+        if (JumpPoint[0].type =='W')
+        {
+        ImageDeal[Ysite].LeftBorder =ImageDeal[Ysite + 1].LeftBorder;
+        } else {
+        ImageDeal[Ysite].LeftBorder = JumpPoint[0].point;
+        }
+        if (JumpPoint[1].type == 'W')
+        {
+        ImageDeal[Ysite].RightBorder =ImageDeal[Ysite + 1].RightBorder;
+        } else {
+        ImageDeal[Ysite].RightBorder = JumpPoint[1].point;
+        }
+        ImageDeal[Ysite].IsLeftFind =JumpPoint[0].type;
+        ImageDeal[Ysite].IsRightFind = JumpPoint[1].type;
+```
+
+`JumpPoint.type` 有三种结果：
+| type | 含义 |
+|------|------|
+| `'T'` | 正常找到跳变点 |
+| `'W'` | 窗口里全是白，没边（"丢边"） |
+| `'H'` | 发现了跳变但跳得太猛（异常大跳变） |
+
+- 找到了（`'T'`）：直接记录。
+- 没找到（`'W'`）：先**用上一行的边界顶替**，不能空着。
+- 记录本行的查找状态 `IsLeftFind` / `IsRightFind`，给后面用。
+
+---
+
+## 第四部分：纠正"大跳变"（732–774 行）
+
+```732:774:c:\Users\Admin\Desktop\image\image.c
+        if (( ImageDeal[Ysite].IsLeftFind == 'H'
+            ||ImageDeal[Ysite].IsRightFind == 'H')) {
+        if (ImageDeal[Ysite].IsLeftFind == 'H')
+            for (Xsite = (ImageDeal[Ysite].LeftBorder + 1); ...)
+            {
+                if ((*(PicTemp + Xsite) == 0) && (*(PicTemp + Xsite + 1) != 0)) {
+                ImageDeal[Ysite].LeftBorder = Xsite;
+                ImageDeal[Ysite].IsLeftFind = 'T';
+                break;
+                ...
+            }
+        if ((ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder) <= 7)
+        {
+            ImageStatus.OFFLine = Ysite + 1;
+            break;
+        }
+```
+
+**通俗理解**：
+
+- 如果发现边界"跳得太猛"（`'H'`），说明可能是噪点或特殊地物（如十字路口横线）搞的，**不能直接用**。
+- 于是在当前左右边界之间**重新细扫**，找最近的黑→白跳变点，更新边界，并把状态改为"正常`'T'`"。
+- 修正之后，如果两条边线宽度**小于 7 像素**，说明已经看不到有效赛道了（可能车已经快出界或者到了图像边缘），就把 `OFFLine` 设为当前行，**停止继续向上处理**。
+
+**比喻**：就像你摸墙找门缝，突然手一滑摸到一个大裂缝（大跳变）——这时重新仔细摸，找到真正的门缝边缘；如果重新摸发现墙太窄了，就不往里走了。
+
+---
+
+## 第五部分：丢边行的斜率外推补边（776–850 行）
+
+这是函数里最"智能"的一块，分**右边丢边**和**左边丢边**两段对称逻辑：
+
+```781:819:c:\Users\Admin\Desktop\image\image.c
+        if(  ImageStatus.Road_type != Ramp)
+        {
+        if (    ImageDeal[Ysite].IsRightFind == 'W'
+            &&Ysite > 10 && Ysite < 50
+            &&ImageStatus.Road_type!=Barn_in)
+        {
+            if (Get_R_line == 'F')
+            {
+                Get_R_line = 'T';
+                ytemp_W_R = Ysite + 2;
+                for (ysite = Ysite + 1; ysite < Ysite + 15; ysite++) {
+                if (ImageDeal[ysite].IsRightFind =='T')
+                    R_found_point++;
+                }
+                if (R_found_point > 8)
+                {
+                D_R = (...右边界列坐标差...) / (...行数差...);
+                if (D_R > 0)  R_Found_T = 'T';
+                }
+            }
+            if (R_Found_T == 'T')
+                ImageDeal[Ysite].RightBorder = ImageDeal[ytemp_W_R].RightBorder - D_R * (ytemp_W_R - Ysite);
+            LimitL/LimitH 限幅
+```
+
+**通俗理解（以右边线为例）**：
+
+1. **触发条件**：本行右边界"丢了"（`'W'`），且行号在合理范围内，且不是坡道/车库等特殊场景。
+2. **本帧只算一次斜率**（`Get_R_line == 'F'`）：往下方 15 行里数"有多少行是正常找到边的"，超过 8 行就算有效。
+3. **算斜率**：用下方这些正常行的边界坐标拟合出直线斜率 `D_R`（边线向上走每行平均偏几列）。
+4. **要求斜率 > 0**：因为摄像头梯形畸变，远处的边线一般往内收，斜率应该是正的；负斜率认为异常不外推。
+5. **外推填坑**：用参考行的边界值 + 斜率 × 行差，**把这行丢边的边界"推算"出来**。
+
+**左边线**：完全对称，用 `D_L`、`L_Found_T`、`ytemp_W_L` 做同样的事。
+
+**比喻**：你沿着公路开车，突然有一段路边没有白线了（丢边）。你会怎么办？——看看后面的白线走向，**沿着这个趋势把没有线的那段"想象"出来**，继续保持方向。这就是这段代码在做的事。
+
+---
+
+## 第六部分：统计丢边行数（851–862 行）
+
+```851:862:c:\Users\Admin\Desktop\image\image.c
+        if (ImageDeal[Ysite].IsLeftFind == 'W'&&ImageDeal[Ysite].IsRightFind == 'W')
+            {  ImageStatus.WhiteLine++;  }
+        if (ImageDeal[Ysite].IsLeftFind == 'W'&&Ysite<55)
+            {  ImageStatus.Left_Line++;  }
+        if (ImageDeal[Ysite].IsRightFind == 'W'&&Ysite<55)
+            {  ImageStatus.Right_Line++;  }
+```
+
+每处理完一行，把本行的丢边情况**计入统计**：
+- `WhiteLine`：左右同时丢边的行数（可能是全白路面、十字路口横穿等）。
+- `Left_Line` / `Right_Line`：单侧丢边行数（弯道、圆环常见）。
+
+这三个计数后续被用来**判断当前处于什么路段**（十字、圆环、还是直道）。
+
+---
+
+## 第七部分：行收尾——更新几何量 + 提前退出（865–883 行）
+
+```865:883:c:\Users\Admin\Desktop\image\image.c
+        LimitL(ImageDeal[Ysite].LeftBorder);
+        LimitH(ImageDeal[Ysite].LeftBorder);
+        LimitL(ImageDeal[Ysite].RightBorder);
+        LimitH(ImageDeal[Ysite].RightBorder);
+
+        ImageDeal[Ysite].Wide = ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder;
+        ImageDeal[Ysite].Center =(ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) / 2;
+
+        if (ImageDeal[Ysite].Wide <= 7) {
+            ImageStatus.OFFLine = Ysite + 1;
+            break;
+        }
+        else if (ImageDeal[Ysite].RightBorder <= 10 || ImageDeal[Ysite].LeftBorder >= 70) {
+            ImageStatus.OFFLine = Ysite + 1;
+            break;
+        }
+```
+
+每行结束前：
+1. **再次限幅**，确保边界在 `[0, 79]`。
+2. 算 **`Wide`**（当前行赛道宽度 = 右 - 左）和 **`Center`**（中心列 = (左+右)/2）。
+3. **两个退出条件**：
+   - 宽度 `<= 7`：图像里赛道已经"细得看不出来了"，停止。
+   - 右边界 `<= 10` 或 左边界 `>= 70`：边线跑到图像边缘附近了，已经不正常，停止。
+   - 停止时把 `OFFLine` 更新为当前行，告诉后续代码"从这里往上不处理"。
+
+---
+
+## 总流程图（一句话串起来）
+
+```
+从第54行开始↓
+    开小窗口 → GetJumpPointFromDet扫跳变
+        ↓ 正常'T'     ↓ 丢边'W'        ↓ 大跳变'H'
+    直接记录      先继承上一行     在边界内重扫后修正
+        ↓
+    如果丢边 → 尝试用下方行的斜率"外推"补回来
+        ↓
+    统计丢边次数 → WhiteLine/Left_Line/Right_Line++
+        ↓
+    更新Wide/Center → 检查是否要提前停止
+        ↓
+    Ysite-- → 下一行
+```
+
+**一句话总结**：这个函数就像一个"从近处往远处延伸的传感器"，每行都借助上一行的结果缩小搜索范围，碰到边丢了就用趋势推算，碰到异常就局部重扫，碰到实在找不到了就告诉系统"我只能看这么远"。

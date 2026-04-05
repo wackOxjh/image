@@ -373,8 +373,7 @@ uint8 Threshold_deal(uint8* image,
     for (j = 0; j < width; j += 1) {
       // if((sun_mode&&data[i*width+j]<pixel_threshold)||(!sun_mode))
       //{
-      pixelCount[(
-          int)data[i * width + j]]++;  //将当前的点的像素值作为计数数组的下标
+      pixelCount[(int)data[i * width + j]]++;  //将当前的点的像素值作为计数数组的下标
       gray_sum += (int)data[i * width + j];  //灰度值总和
       //}
     }
@@ -390,8 +389,7 @@ uint8 Threshold_deal(uint8* image,
   float w0, w1, u0tmp, u1tmp, u0, u1, u, deltaTmp, deltaMax = 0;
   w0 = w1 = u0tmp = u1tmp = u0 = u1 = u = deltaTmp = 0;
   for (j = 0; j < pixel_threshold; j++) {
-    w0 +=
-        pixelPro[j];  //背景部分每个灰度值的像素点所占比例之和 即背景部分的比例
+    w0 += pixelPro[j];  //背景部分每个灰度值的像素点所占比例之和 即背景部分的比例
     u0tmp += j * pixelPro[j];  //背景部分 每个灰度值的点的比例 *灰度值
 
     w1 = 1 - w0;
@@ -515,7 +513,7 @@ void GetJumpPointFromDet(uint8* p,uint8 type,int L,int H,JumpPointtypedef* Q)  /
     }
   } else if (type == 'R')                       //扫描右边线
   {
-    for (i = L; i <= H; i++)                    //从右往左扫
+    for (i = L; i <= H; i++)                    //从左往右扫
     {
       if (*(p + i) == 1 && *(p + i + 1) != 1)   //找由黑到白的跳变
       {
@@ -552,9 +550,11 @@ uint8 DrawLinesFirst(void) {
   {
     for (Xsite = 0; Xsite < ImageSensorMid; Xsite++)    //找左右边线
     {
+      //从中心点向左移动 Xsite 个像素
       if (*(PicTemp + ImageSensorMid - Xsite) != 0)     //一旦找到左或右赛道到中心距离，就break
-        break;                                          //并且记录Xsite
-      if (*(PicTemp + ImageSensorMid + Xsite) != 0)
+        break; 
+      //从中心点向右移动 Xsite 个像素                    //并且记录Xsite
+      if (*(PicTemp + ImageSensorMid + Xsite) != 0)     //等价写法：PicTemp[ImageSensorMid] == 0。数组下标操作符 [] 本质也是指针运算：a[i] 等同于 *(a + i)。
         break;
     }
 
@@ -673,7 +673,7 @@ ImageDeal[58] … ImageDeal[55]：每行写入 RightBorder、LeftBorder、IsLeft
 完成整帧边线估计，包括“跳变修正”、“无边补线”和“上下层状态累积”。
 这是依据前5行（DrawLinesFirst() 得到）的基础边线、逐行扩展到更远处，构成完整边线跟踪。*/
 /*边线追逐大致得到全部边线*/
-static void DrawLinesProcess(void)  //////不用更改
+void DrawLinesProcess(void)  //////不用更改
 {
   uint8 L_Found_T = 'F';  //确定无边斜率的基准有边行是否被找到的标志
   uint8 Get_L_line = 'F';  //找到这一帧图像的基准左斜率
@@ -693,7 +693,7 @@ static void DrawLinesProcess(void)  //////不用更改
     PicTemp = Pixle[Ysite];
     JumpPointtypedef JumpPoint[2];                                          // 0左1右
     if (ImageStatus.Road_type != Cross_ture
-           /* &&SystemData.SpeedData.Length*OX>500*/) {
+        /* &&SystemData.SpeedData.Length*OX>500*/) {
       IntervalLow =ImageDeal[Ysite + 1].RightBorder -ImageScanInterval;             //从上一行右边线-Interval的点开始（确定扫描开始点）
       IntervalHigh =ImageDeal[Ysite + 1].RightBorder + ImageScanInterval;           //到上一行右边线+Interval的点结束（确定扫描结束点）
     } else {
@@ -714,177 +714,175 @@ static void DrawLinesProcess(void)  //////不用更改
 
     if (JumpPoint[0].type =='W')                                                    //如果本行左边线不正常跳变，即这10个点都是白的
     {
-      ImageDeal[Ysite].LeftBorder =ImageDeal[Ysite + 1].LeftBorder;                 //本行左边线用上一行的数值
-    } else                                                                          //左边线正常
-    {
+      ImageDeal[Ysite].LeftBorder =ImageDeal[Ysite + 1].LeftBorder;                 //本行左边线沿用上一行的数值
+    } else {                                                                         //左边线正常（'T'）
       ImageDeal[Ysite].LeftBorder = JumpPoint[0].point;                             //记录下来啦
     }
 
     if (JumpPoint[1].type == 'W')                                                   //如果本行右边线不正常跳变
     {
-      ImageDeal[Ysite].RightBorder =ImageDeal[Ysite + 1].RightBorder;               //本行右边线用上一行的数值
-    } else                                                                          //右边线正常
-    {
+      ImageDeal[Ysite].RightBorder =ImageDeal[Ysite + 1].RightBorder;               //本行右边线沿用上一行的数值
+    } else {                                                                          //右边线正常（'T'）
       ImageDeal[Ysite].RightBorder = JumpPoint[1].point;                            //记录下来啦
     }
 
     ImageDeal[Ysite].IsLeftFind =JumpPoint[0].type;                                 //记录本行是否找到边线，即边线类型
     ImageDeal[Ysite].IsRightFind = JumpPoint[1].type;
 
-    //重新确定那些大跳变的边缘
+
+    //重新确定那些大跳变的边缘-------------------可抽象为：发现了跳变但跳得太猛（异常大跳变）
     if (( ImageDeal[Ysite].IsLeftFind == 'H'
-         ||ImageDeal[Ysite].IsRightFind == 'H')) {
+        ||ImageDeal[Ysite].IsRightFind == 'H')) 
+    {
       if (ImageDeal[Ysite].IsLeftFind == 'H')                                   //如果左边线大跳变
         for (Xsite = (ImageDeal[Ysite].LeftBorder + 1);
-             Xsite <= (ImageDeal[Ysite].RightBorder - 1);
-             Xsite++)                                                           //左右边线之间重新扫描
-        {
-          if ((*(PicTemp + Xsite) == 0) && (*(PicTemp + Xsite + 1) != 0)) {
-            ImageDeal[Ysite].LeftBorder =Xsite;                                 //如果上一行左边线的右边有黑白跳变则为绝对边线直接取出
+            Xsite <= (ImageDeal[Ysite].RightBorder - 1);
+            Xsite++)                                                           //左右边线之间重新扫描
+      {
+        if ((*(PicTemp + Xsite) == 0) && (*(PicTemp + Xsite + 1) != 0)) {
+            ImageDeal[Ysite].LeftBorder =Xsite;                                 //如果上一行左边线的右边有“黑白跳变”则为绝对边线直接取出
             ImageDeal[Ysite].IsLeftFind = 'T';
             break;
-          } else if (*(PicTemp + Xsite) != 0)                                   //一旦出现白点则直接跳出
+        } else if (*(PicTemp + Xsite) != 0)                                   //一旦出现白点则直接跳出
             break;
           else if (Xsite ==(ImageDeal[Ysite].RightBorder - 1))
-          {
-             ImageDeal[Ysite].IsLeftFind = 'T';
+        {
+            ImageDeal[Ysite].IsLeftFind = 'T';
             break;
-          }
         }
-      if ((ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder) <=
-          7)                              //图像宽度限定
+      }
+      if ((ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder) <= 7)                              //图像宽度限定
       {
         ImageStatus.OFFLine = Ysite + 1;  //如果这行比7小了后面直接不要了
         break;
       }
-      if (ImageDeal[Ysite].IsRightFind == 'H')
+
+      if (ImageDeal[Ysite].IsRightFind == 'H')                                //如果右边线大跳变
         for (Xsite = (ImageDeal[Ysite].RightBorder - 1);
-             Xsite >= (ImageDeal[Ysite].LeftBorder + 1); Xsite--) {
-          if ((*(PicTemp + Xsite) == 0) && (*(PicTemp + Xsite - 1) != 0)) {
-            ImageDeal[Ysite].RightBorder =
-                Xsite;                    //如果右边线的左边还有黑白跳变则为绝对边线直接取出
-            ImageDeal[Ysite].IsRightFind = 'T';
-            break;
-          } else if (*(PicTemp + Xsite) != 0)
-            break;
-          else if (Xsite == (ImageDeal[Ysite].LeftBorder + 1))
+            Xsite >= (ImageDeal[Ysite].LeftBorder + 1); Xsite--) {
+          if ((*(PicTemp + Xsite) == 0) && (*(PicTemp + Xsite - 1) != 0)) {     //”黑白跳变“
+              ImageDeal[Ysite].RightBorder = Xsite;                    //如果右边线的左边还有“黑白跳变”则为绝对边线直接取出
+              ImageDeal[Ysite].IsRightFind = 'T';
+              break;
+          } else if (*(PicTemp + Xsite) != 0)                           //一旦出现白点则直接跳出
+              break;
+            else if (Xsite == (ImageDeal[Ysite].LeftBorder + 1))
           {
-            ImageDeal[Ysite].RightBorder = Xsite;
-            ImageDeal[Ysite].IsRightFind = 'T';
-            break;
+              ImageDeal[Ysite].RightBorder = Xsite;
+              ImageDeal[Ysite].IsRightFind = 'T';
+              break;
           }
         }
-    }
+     }
 
- /***********重新确定无边行************/
+     /***********重新确定无边行************/
     int ysite = 0;
     uint8 L_found_point = 0;
     uint8 R_found_point = 0;
 
-
+    #if 0
     if(  ImageStatus.Road_type != Ramp)
     {
-    if (    ImageDeal[Ysite].IsRightFind == 'W'
+      if (    ImageDeal[Ysite].IsRightFind == 'W'
           &&Ysite > 10
           &&Ysite < 50
           &&ImageStatus.Road_type!=Barn_in
           )                     //最早出现的无边行
-    {
+      {
       if (Get_R_line == 'F')    //这一帧图像没有跑过这个找基准线的代码段才运行
       {
-        Get_R_line = 'T';       //找了  一帧图像只跑一次 置为T
-        ytemp_W_R = Ysite + 2;
-        for (ysite = Ysite + 1; ysite < Ysite + 15; ysite++) {
+          Get_R_line = 'T';       //找了  一帧图像只跑一次 置为T
+          ytemp_W_R = Ysite + 2;
+          for (ysite = Ysite + 1; ysite < Ysite + 15; ysite++) {
           if (ImageDeal[ysite].IsRightFind =='T')  //往无边行下面搜索  一般都是有边的
-            R_found_point++;
-        }
-        if (R_found_point >8)                      //找到基准斜率边  做延长线重新确定无边   当有边的点数大于8
-        {
+              R_found_point++;
+          }
+          if (R_found_point >8)                      //找到基准斜率边  做延长线重新确定无边   当有边的点数大于8
+          {
           D_R = ((float)(ImageDeal[Ysite + R_found_point].RightBorder - ImageDeal[Ysite + 3].RightBorder)) /((float)(R_found_point - 3));
                                                   //求下面这些点连起来的斜率
                                                   //好给无边行做延长线左个基准
           if (D_R > 0) {
-            R_Found_T ='T';                       //如果斜率大于0  那么找到了这个基准行  因为梯形畸变
+              R_Found_T ='T';                       //如果斜率大于0  那么找到了这个基准行  因为梯形畸变
                                                   //所以一般情况都是斜率大于0  小于0的情况也不用延长 没必要
           } else {
-            R_Found_T = 'F';                      //没有找到这个基准行
-            if (D_R < 0)
+              R_Found_T = 'F';                      //没有找到这个基准行
+              if (D_R < 0)
               ExtenRFlag = 'F';                   //这个标志位用于十字角点补线  防止图像误补用的
           }
-        }
+          }
       }
       if (R_Found_T == 'T')
-        ImageDeal[Ysite].RightBorder =ImageDeal[ytemp_W_R].RightBorder -D_R * (ytemp_W_R - Ysite);  //如果找到了 那么以基准行做延长线
+          ImageDeal[Ysite].RightBorder =ImageDeal[ytemp_W_R].RightBorder -D_R * (ytemp_W_R - Ysite);  //如果找到了 那么以基准行做延长线
 
       LimitL(ImageDeal[Ysite].RightBorder);  //限幅
       LimitH(ImageDeal[Ysite].RightBorder);  //限幅
-    }
+      }
 
-    if (ImageDeal[Ysite].IsLeftFind == 'W' && Ysite > 10 && Ysite < 50 &&
-        ImageStatus.Road_type != Barn_in)    //下面同理  左边界
-    {
+      if (ImageDeal[Ysite].IsLeftFind == 'W' && Ysite > 10 && Ysite < 50 &&
+          ImageStatus.Road_type != Barn_in)    //下面同理  左边界
+      {
       if (Get_L_line == 'F') {
-        Get_L_line = 'T';
-        ytemp_W_L = Ysite + 2;
-        for (ysite = Ysite + 1; ysite < Ysite + 15; ysite++) {
+          Get_L_line = 'T';
+          ytemp_W_L = Ysite + 2;
+          for (ysite = Ysite + 1; ysite < Ysite + 15; ysite++) {
           if (ImageDeal[ysite].IsLeftFind == 'T')
-            L_found_point++;
-        }
-        if (L_found_point > 8)              //找到基准斜率边  做延长线重新确定无边
-        {
+              L_found_point++;
+          }
+          if (L_found_point > 8)              //找到基准斜率边  做延长线重新确定无边
+          {
           D_L = ((float)(ImageDeal[Ysite + 3].LeftBorder -ImageDeal[Ysite + L_found_point].LeftBorder)) /((float)(L_found_point - 3));
           if (D_L > 0) {
-            L_Found_T = 'T';
+              L_Found_T = 'T';
 
           } else {
-            L_Found_T = 'F';
-            if (D_L < 0)
+              L_Found_T = 'F';
+              if (D_L < 0)
               ExtenLFlag = 'F';
           }
-        }
+          }
       }
 
       if (L_Found_T == 'T')
-        ImageDeal[Ysite].LeftBorder =ImageDeal[ytemp_W_L].LeftBorder + D_L * (ytemp_W_L - Ysite);
+          ImageDeal[Ysite].LeftBorder =ImageDeal[ytemp_W_L].LeftBorder + D_L * (ytemp_W_L - Ysite);
 
       LimitL(ImageDeal[Ysite].LeftBorder);  //限幅
       LimitH(ImageDeal[Ysite].LeftBorder);  //限幅
+      }
     }
-}
+     #endif
+    //统计丢边行数
     if (ImageDeal[Ysite].IsLeftFind == 'W'&&ImageDeal[Ysite].IsRightFind == 'W')
-         {
-             ImageStatus.WhiteLine++;  //要是左右都无边，丢边数+1
-         }
+        {
+            ImageStatus.WhiteLine++;  //要是左右都无边，丢边数+1
+        }
         if (ImageDeal[Ysite].IsLeftFind == 'W'&&Ysite<55)
         {
-             ImageStatus.Left_Line++;
+            ImageStatus.Left_Line++;
         }
         if (ImageDeal[Ysite].IsRightFind == 'W'&&Ysite<55)
         {
-             ImageStatus.Right_Line++;
+            ImageStatus.Right_Line++;
         }
 
-
-      LimitL(ImageDeal[Ysite].LeftBorder);   //限幅
-      LimitH(ImageDeal[Ysite].LeftBorder);   //限幅
-      LimitL(ImageDeal[Ysite].RightBorder);  //限幅
-      LimitH(ImageDeal[Ysite].RightBorder);  //限幅
-
-      ImageDeal[Ysite].Wide =ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder;
-      ImageDeal[Ysite].Center =(ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) / 2;
+    
+    LimitL(ImageDeal[Ysite].LeftBorder);   //限幅
+    LimitH(ImageDeal[Ysite].LeftBorder);   //限幅
+    LimitL(ImageDeal[Ysite].RightBorder);  //限幅
+    LimitH(ImageDeal[Ysite].RightBorder);  //限幅
+    
+    ImageDeal[Ysite].Wide =ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder;
+    ImageDeal[Ysite].Center =(ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) / 2;
 
     if (ImageDeal[Ysite].Wide <= 7)         //重新确定可视距离
     {
       ImageStatus.OFFLine = Ysite + 1;
       break;
-    }
-
-    else if (  ImageDeal[Ysite].RightBorder <= 10
-             ||ImageDeal[Ysite].LeftBorder >= 70) {
-              ImageStatus.OFFLine = Ysite + 1;
-              break;
+    } else if (  ImageDeal[Ysite].RightBorder <= 10 ||ImageDeal[Ysite].LeftBorder >= 70) {
+      ImageStatus.OFFLine = Ysite + 1;
+      break;
     }                                        //当图像宽度小于0或者左右边达到一定的限制时，则终止巡边
-  }
+   }
 
 
   return;
@@ -2853,15 +2851,15 @@ void GetDet() {
     else if (ImageStatus.Road_type == Straight)
     TowPoint = SystemData.straighet_towpoint;
 
-  else if(ImageStatus.Road_type ==Cross_ture)
-  {
-      TowPoint=22;
-  }
-  else if(ImageStatus.Road_type == LeftCirque || ImageStatus.Road_type == RightCirque)
-  {
-      TowPoint=22;
-  }
-else
+    else if(ImageStatus.Road_type ==Cross_ture)
+    {
+        TowPoint=22;
+    }
+    else if(ImageStatus.Road_type == LeftCirque || ImageStatus.Road_type == RightCirque)
+    {
+        TowPoint=22;
+    }
+    else
     TowPoint = ImageStatus.TowPoint-SpeedGain;                                          //速度越快前瞻越长
 
   if (TowPoint < ImageStatus.OFFLine)
