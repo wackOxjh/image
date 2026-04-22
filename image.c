@@ -61,12 +61,21 @@ uint8 Half_Bend_Wide[60] =                      //弯道赛道半宽
 };
 
 
-uint8 buxianwide[60]={6,7,8,9,10,11,12,13,14,15,
-                      16,17,18,19,20,21,22,23,24,25,
-                      26,27,28,29,30,31,32,33,34,35,
-                      36,37,38,39,40,41,42,43,44,45,
-                      46,47,48,49,50,51,52,53,54,55,
-                      56,57,58,59,60,61,62,63,64,65};
+/* 160×120分辨率补线宽度表：行数×2(120行)，像素宽度值×2
+ * 索引对应行号Ysite，值为该行期望的赛道总宽（像素），
+ * 由透视变换决定，近处宽远处窄，数值等于原80×60版本的2倍 */
+uint8 buxianwide[120]={12,12,14,14,16,16,18,18,20,20,
+                       22,22,24,24,26,26,28,28,30,30,
+                       32,32,34,34,36,36,38,38,40,40,
+                       42,42,44,44,46,46,48,48,50,50,
+                       52,52,54,54,56,56,58,58,60,60,
+                       62,62,64,64,66,66,68,68,70,70,
+                       72,72,74,74,76,76,78,78,80,80,
+                       82,82,84,84,86,86,88,88,90,90,
+                       92,92,94,94,96,96,98,98,100,100,
+                       102,102,104,104,106,106,108,108,110,110,
+                       112,112,114,114,116,116,118,118,120,120,
+                       122,122,124,124,126,126,128,128,130,130};
 
 int adczongzhi;
 int tuoluoyijifen;//避免错误
@@ -441,9 +450,8 @@ void Pixle_Filter() {
 
   for (nr = 10; nr < 40; nr++) {
     for (nc = 10; nc < 70; nc = nc + 1) {
-      if ((Pixle[nr][nc] == 0) && (Pixle[nr - 1][nc] + Pixle[nr + 1][nc] +
-                                       Pixle[nr][nc + 1] + Pixle[nr][nc - 1] >=
-                                   3)) {
+      if ((Pixle[nr][nc] == 0) && (Pixle[nr - 1][nc] + Pixle[nr + 1][nc] + Pixle[nr][nc + 1] + Pixle[nr][nc - 1] >= 3)) 
+      {
         Pixle[nr][nc] = 1;
       }
       //      else
@@ -1297,7 +1305,9 @@ int icm_start_test_cross = 0;  //开启icm积分标志位
 
 /****十字检测*****/  //上面的算法已经滤除了十字  相当于不要处理
 void Cross_Test() {
-  if (ImageStatus.OFFLine > 15)                       //当可视距离比较近的时候 开启积分处理  用于特殊处理270°弯道之后的十字
+  /* 160×120: OFFLine阈值由15→30（等比于行数×2），
+   * OFFLine>30表示可视距离很近，开启陀螺仪积分辅助处理270°弯后十字 */
+  if (ImageStatus.OFFLine > 30)
     icm_start_test_cross = 1;
   else
     icm_start_test_cross = 0;
@@ -2644,15 +2654,18 @@ void Cross_Test2(){
     int rightlowlen=0;
     int rightmiddlen=0;
     int righthighlen=0;
-        //找左边十字特征
-    for (Ysite = 54; Ysite > ImageStatus.OFFLine+2; Ysite--) {
+        /* 找左边十字特征
+         * 160×120: 起始行54→108（54/60×120），斜率参考偏移行5→10，
+         * 像素跳变判定阈值2→4（像素列数×2） */
+    for (Ysite = 108; Ysite > ImageStatus.OFFLine+2; Ysite--) {
 
         //十字底边的有边
         if(ImageDeal[Ysite].IsLeftFind=='T'&&ImageDeal[Ysite-1].IsLeftFind=='T'&&leftlowlen==0){
             while(ImageDeal[Ysite].IsLeftFind=='T'){
                 leftlowlen++;
                 Ysite--;
-                if(ImageDeal[Ysite].LeftBorder<ImageDeal[Ysite+5].LeftBorder-2){
+                /* 10行内左边界向内收缩超过4像素，认为是弯道而非十字底边，重置计数 */
+                if(ImageDeal[Ysite].LeftBorder<ImageDeal[Ysite+10].LeftBorder-4){
                     leftlowlen=1;
                     break;
                 }
@@ -2676,14 +2689,15 @@ void Cross_Test2(){
             }
         }
     }
-        //找右边十字特征
-    for (Ysite = 54; Ysite > ImageStatus.OFFLine+2; Ysite--) {
+        /* 找右边十字特征，同理 */
+    for (Ysite = 108; Ysite > ImageStatus.OFFLine+2; Ysite--) {
         //十字底边的有边
         if(ImageDeal[Ysite].IsRightFind=='T'&&ImageDeal[Ysite-1].IsRightFind=='T'&&rightlowlen==0){
             while(ImageDeal[Ysite].IsRightFind=='T'){
                 rightlowlen++;
                 Ysite--;
-                if(ImageDeal[Ysite].RightBorder>ImageDeal[Ysite+5].RightBorder+2){
+                /* 10行内右边界向内收缩超过4像素，认为是弯道而非十字底边，重置计数 */
+                if(ImageDeal[Ysite].RightBorder>ImageDeal[Ysite+10].RightBorder+4){
                     rightlowlen=1;
                     break;
                 }
@@ -2706,11 +2720,13 @@ void Cross_Test2(){
             }
         }
     }
-    if(     leftlowlen > 5 &&leftmiddlen > 5
-          &&lefthighlen>4
-          &&rightlowlen>5
-          &&rightmiddlen>5
-          &&righthighlen>4
+    /* 160×120: 各段最小行数阈值×2（底部>10行、中部>10行、上部>8行）
+     * 同时满足左右两侧三段特征才确认为十字路口 */
+    if(     leftlowlen > 10 &&leftmiddlen > 10
+          &&lefthighlen>8
+          &&rightlowlen>10
+          &&rightmiddlen>10
+          &&righthighlen>8
           )
         ImageStatus.Road_type=Cross_ture;
 
@@ -2736,12 +2752,15 @@ void Pcir_Handle() {
 
   if (ImageStatus.Road_type==Cross_ture)   //第二圈左补线
   {
-      for (Ysite = 58; Ysite > ImageStatus.OFFLine; Ysite--)
+      /* 160×120: 起始行58→116（接近图像底部），
+       * buxianwide已扩展为120项且值×2，与列数匹配；
+       * Fit1参数：起始行118（原59×2），平滑行数100（原50×2） */
+      for (Ysite = 116; Ysite > ImageStatus.OFFLine; Ysite--)
       {
       ImageDeal[Ysite].Center = ImageDeal[Ysite].RightBorder - buxianwide[Ysite]*0.5;
       ImageDeal[Ysite].LeftBorder=ImageDeal[Ysite].RightBorder - buxianwide[Ysite];
       }
-      Fit1(59,50);
+      Fit1(118,100);
    }
 
 }
@@ -2853,11 +2872,11 @@ void GetDet() {
 
     else if(ImageStatus.Road_type ==Cross_ture)
     {
-        TowPoint=22;
+        TowPoint=44;  /* 160×120: 前瞻行 22→44（行数×2，保持相同的物理前视距离） */
     }
     else if(ImageStatus.Road_type == LeftCirque || ImageStatus.Road_type == RightCirque)
     {
-        TowPoint=22;
+        TowPoint=44;  /* 160×120: 同上 */
     }
     else
     TowPoint = ImageStatus.TowPoint-SpeedGain;                                          //速度越快前瞻越长
