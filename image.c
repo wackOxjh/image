@@ -2,38 +2,38 @@
 uint8 length_max = 0;
 uint8 Stop_car_Flag = 0;
 //int flag_ceshi = 0;
-int ImageScanInterval;                         //扫边范围    上一行的边界+-ImageScanInterval
-int ImageScanInterval_Cross;                   //270°的弯道后十字的扫线范围
-uint8 Image_Use[LCDH][LCDW];          //灰度图像
-uint8 Pixle[LCDH][LCDW];              //用于处理的二值化图像
-//uint8 uPixle[uLCDH][uLCDW];                      //用于显示解压后的二值化图像
-//uint8 UImage_Use[uLCDH][uLCDW];                  //用于显示解压后的灰度图像
-static int Ysite = 0, Xsite = 0;                   //Y坐标=列
-static uint8* PicTemp;                             //保存单行图像
-static int IntervalLow = 0, IntervalHigh = 0;      //定义高低扫描区间
-static int ytemp = 0;                              //存放行
-static int TFSite = 0, FTSite = 0;                 //存放行
-static float DetR = 0, DetL = 0;                   //存放斜率
-static int  BottomBorderRight = 79,                 //59行右边界
-            BottomBorderLeft = 0,                   //59行左边界
-            BottomCenter = 0;                       //59行中点
-ImageDealDatatypedef ImageDeal[60];                //记录单行的信息
-ImageStatustypedef ImageStatus;                    //图像的全局变量
-ImageStatustypedef ImageData;             ///////需要修改的图像阈值参数
+int ImageScanInterval;                         //鎵敓绔嚖鎷峰洿    閿熸枻鎷蜂竴閿熷彨鐨勮竟鏂ゆ嫹+-ImageScanInterval
+int ImageScanInterval_Cross;                   //270閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鍗侀敓琛楃鎷锋壂閿熺鍑ゆ嫹鍥�
+uint8 Image_Use[LCDH][LCDW];          //閿熸彮璁规嫹鍥鹃敓鏂ゆ嫹
+// uint8 Pixle[LCDH][LCDW];              //閿熸枻鎷烽敓鑺傝揪鎷烽敓鏂ゆ嫹閿熶茎璁规嫹鍊奸敓鏂ゆ嫹鍥鹃敓鏂ゆ嫹
+uint8 uPixle[uLCDH][uLCDW];                      //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷风ず閿熸枻鎷峰帇閿熸枻鎷蜂憨閿熻纰夋嫹閿熼叺纭锋嫹閿燂拷
+uint8 UImage_Use[uLCDH][uLCDW];                  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷风ず閿熸枻鎷峰帇閿熸枻鎷峰箷鍙堕敓閰电》鎷烽敓锟�
+static int Ysite = 0, Xsite = 0;                   //Y閿熸枻鎷烽敓鏂ゆ嫹=閿熸枻鎷�
+static uint8* PicTemp;                             //閿熸枻鎷烽敓鑺ュ崟閿熸枻鎷峰浘閿熸枻鎷�
+static int IntervalLow = 0, IntervalHigh = 0;      //閿熸枻鎷烽敓鏂ゆ嫹鍙╅敓缂搭煉鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
+static int ytemp = 0;                              //閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+static int TFSite = 0, FTSite = 0;                 //閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+static float DetR = 0, DetL = 0;                   //閿熸枻鎷烽敓鍙唻鎷烽敓锟�
+static int BottomBorderRight = 79,                 //59閿熸枻鎷烽敓鎻竟鏂ゆ嫹
+BottomBorderLeft = 0,                              //59閿熸枻鎷烽敓鏂ゆ嫹鍛撻敓锟�
+BottomCenter = 0;                                  //59閿熸枻鎷烽敓鍙鎷�
+ImageDealDatatypedef ImageDeal[60];                //閿熸枻鎷峰綍閿熸枻鎷烽敓鍙鎷烽敓鏂ゆ嫹鎭�
+ImageStatustypedef ImageStatus;                    //鍥鹃敓鏂ゆ嫹閿熼ズ顐嫹鐩撮敓鏂ゆ嫹閿燂拷
+ImageStatustypedef ImageData;             ///////閿熸枻鎷疯閿熺潾鏀圭鎷峰浘閿熸枻鎷烽敓鏂ゆ嫹鍊奸敓鏂ゆ嫹閿熸枻鎷�
 SystemDatatypdef SystemData;
 ImageFlagtypedef ImageFlag;
-uint8 Ring_Help_Flag = 0;                      //进环辅助标志
-int Left_RingsFlag_Point1_Ysite, Left_RingsFlag_Point2_Ysite;   //左圆环判断的两点纵坐标
-int Right_RingsFlag_Point1_Ysite, Right_RingsFlag_Point2_Ysite; //右圆环判断的两点纵坐标
-int Point_Xsite,Point_Ysite;                   //拐点横纵坐标
-int Repair_Point_Xsite,Repair_Point_Ysite;     //补线点横纵坐标
-int forklenth;                                 //确定三叉位置
-int barnlenth;                                 //确定车库位置
-int ramplenth;                                 //确定坡道位置
+uint8 Ring_Help_Flag = 0;                      //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰織
+int Left_RingsFlag_Point1_Ysite, Left_RingsFlag_Point2_Ysite;   //閿熸枻鎷峰渾閿熸枻鎷烽敓鍙柇纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+int Right_RingsFlag_Point1_Ysite, Right_RingsFlag_Point2_Ysite; //閿熸枻鎷峰渾閿熸枻鎷烽敓鍙柇纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+int Point_Xsite,Point_Ysite;                   //閿熺Ц纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
+int Repair_Point_Xsite,Repair_Point_Ysite;     //閿熸枻鎷烽敓绔鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+int forklenth;                                 //纭敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹浣嶉敓鏂ゆ嫹
+int barnlenth;                                 //纭敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹浣嶉敓鏂ゆ嫹
+int ramplenth;                                 //纭敓鏂ゆ嫹閿熼摪纰夋嫹浣嶉敓鏂ゆ嫹
 uint16 exposure_time_self = 300;
-float Weighting[10] = {0.96, 0.92, 0.88, 0.83, 0.77,0.71, 0.65, 0.59, 0.53, 0.47};//10行权重参数，随意更改，基本不影响，大致按照正态分布即可
-uint8 ExtenLFlag = 0;  //是否左延长标志
-uint8 ExtenRFlag = 0;  //是否右延长标志
+float Weighting[10] = {0.96, 0.92, 0.88, 0.83, 0.77,0.71, 0.65, 0.59, 0.53, 0.47};//10閿熸枻鎷锋潈閿熸埅璇ф嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋ā閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鎺ュ府鎷锋顒婃嫹閿熸枻鎷锋幊閿熸枻鎷烽敓鏂ゆ嫹閿熸暀顒婃嫹妞嶉敓鏂ゆ嫹閿熸枻鎷烽敓锟�
+uint8 ExtenLFlag = 0;  //閿熻鍑ゆ嫹閿熸枻鎷烽敓鎺ョ鎷烽敓鏂ゆ嫹蹇�
+uint8 ExtenRFlag = 0;  //閿熻鍑ゆ嫹閿熸枻鎷烽敓鎺ョ鎷烽敓鏂ゆ嫹蹇�
 float ang_l;
 int ycircle=0;
 int xcircle=0;
@@ -42,7 +42,7 @@ int aycircle=0;
 int bxcircle=0;
 int bycircle=0;
 float K;
-uint8 Half_Road_Wide[60] =                      //直到赛道半宽
+uint8 Half_Road_Wide[60] =                      //鐩撮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 {  1, 1, 1, 1, 2, 2, 3, 3, 4, 4,
         5, 5,6,6,7,8,8,9,9,10,
        11,11,11,12,13,13,14,15,15,16,
@@ -51,7 +51,7 @@ uint8 Half_Road_Wide[60] =                      //直到赛道半宽
        28,28,29,30,30,30,31,32,32,33,
 };
 
-uint8 Half_Bend_Wide[60] =                      //弯道赛道半宽
+uint8 Half_Bend_Wide[60] =                      //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
 {   33,33,33,33,33,33,33,33,33,33,
     33,33,32,32,30,30,29,29,28,27,
     28,27,27,26,26,25,25,24,24,23,
@@ -61,24 +61,15 @@ uint8 Half_Bend_Wide[60] =                      //弯道赛道半宽
 };
 
 
-/* 160×120分辨率补线宽度表：行数×2(120行)，像素宽度值×2
- * 索引对应行号Ysite，值为该行期望的赛道总宽（像素），
- * 由透视变换决定，近处宽远处窄，数值等于原80×60版本的2倍 */
-uint8 buxianwide[120]={12,12,14,14,16,16,18,18,20,20,
-                       22,22,24,24,26,26,28,28,30,30,
-                       32,32,34,34,36,36,38,38,40,40,
-                       42,42,44,44,46,46,48,48,50,50,
-                       52,52,54,54,56,56,58,58,60,60,
-                       62,62,64,64,66,66,68,68,70,70,
-                       72,72,74,74,76,76,78,78,80,80,
-                       82,82,84,84,86,86,88,88,90,90,
-                       92,92,94,94,96,96,98,98,100,100,
-                       102,102,104,104,106,106,108,108,110,110,
-                       112,112,114,114,116,116,118,118,120,120,
-                       122,122,124,124,126,126,128,128,130,130};
+uint8 buxianwide[60]={6,7,8,9,10,11,12,13,14,15,
+                      16,17,18,19,20,21,22,23,24,25,
+                      26,27,28,29,30,31,32,33,34,35,
+                      36,37,38,39,40,41,42,43,44,45,
+                      46,47,48,49,50,51,52,53,54,55,
+                      56,57,58,59,60,61,62,63,64,65};
 
 int adczongzhi;
-int tuoluoyijifen;//避免错误
+int tuoluoyijifen;//閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 
 int Limit(int num, int numH, int numL) {
   if (num > numH)
@@ -88,7 +79,7 @@ int Limit(int num, int numH, int numL) {
   return num;
 }
 //void camera_display(void) {
-//  if (mt9v03x_finish_flag == 1) {  //显示作用 别无它用
+//  if (mt9v03x_finish_flag == 1) {  //閿熸枻鎷风ず閿熸枻鎷烽敓鏂ゆ嫹 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
 //    if (SystemData.GO_OK || SystemData.CameraOK == 1 ||
 //        SystemData.OldCameraOK == 1)
 //         ImageProcess(); //5-6ms
@@ -97,15 +88,15 @@ int Limit(int num, int numH, int numL) {
 //    ++cnt;
 //    cnt %= 2;
 //    if (!cnt) {
-//      if (SystemData.CameraOK == 1)  //调试的时候打开  跑的时候关了
+//      if (SystemData.CameraOK == 1)  //閿熸枻鎷烽敓鐨嗙鎷锋椂閿熸枻鎷烽敓锟�  閿熸澃纰夋嫹鏃堕敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 //        ips114_displayimage01(uPixle[0], uLCDW, uLCDH);
 //      else if (SystemData.OldCameraOK == 1)
 //        ips114_displayimage032(UImage_Use[0], uLCDW, uLCDH);
 //    }
 //  }
 //}
-/*****************直线判断******************/
-float Straight_Judge(uint8 dir, uint8 start, uint8 end)     //返回结果小于1即为直线
+/*****************鐩撮敓鏂ゆ嫹閿熷彨璁规嫹******************/
+float Straight_Judge(uint8 dir, uint8 start, uint8 end)     //閿熸枻鎷烽敓鎴枻鎷烽敓鍙槄鎷烽敓锟�1閿熸枻鎷蜂负鐩撮敓鏂ゆ嫹
 {
     int i;
     float S = 0, Sum = 0, Err = 0, k = 0;
@@ -132,12 +123,12 @@ float Straight_Judge(uint8 dir, uint8 start, uint8 end)     //返回结果小于
 }
 
 
-float Straight_Judge_two(uint8 flag)//返回结果小于1即为直线
+float Straight_Judge_two(uint8 flag)//閿熸枻鎷烽敓鎴枻鎷烽敓鍙槄鎷烽敓锟�1閿熸枻鎷蜂负鐩撮敓鏂ゆ嫹
 {
     float out=0;
     int X_temp[12],Y_temp[12],i=0,Point=1,j=1;
     float K_temp,K_other[12];
-    if(flag==1)//左边线平均斜率计算
+    if(flag==1)//閿熸枻鎷烽敓鏂ゆ嫹閿熺嫛鏂ゆ嫹閿熷彨鎲嬫嫹濮嬮敓鏂ゆ嫹閿燂拷
     {
         for(i=ImageStatus.OFFLine+5;i<30;i++)
         {
@@ -172,7 +163,7 @@ float Straight_Judge_two(uint8 flag)//返回结果小于1即为直线
         }
         if(K_temp<0)return 1;
     }
-    else//右边线平均斜率计算
+    else//閿熸彮鎲嬫嫹閿熸枻鎷峰钩閿熸枻鎷锋枩閿熺粸纭锋嫹閿熸枻鎷�
     {
         for(i=ImageStatus.OFFLine+5;i<30;i++)
         {
@@ -212,9 +203,9 @@ float Straight_Judge_two(uint8 flag)//返回结果小于1即为直线
 
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      最小二乘法拟合中线
-//  @param      start    开始行
-//  @param      num      数据个数
+//  @brief      閿熸枻鎷峰皬閿熸枻鎷烽敓鍓垮嚖鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+//  @param      start    閿熸枻鎷峰閿熸枻鎷�
+//  @param      num      閿熸枻鎷烽敓鎹烽潻鎷烽敓鏂ゆ嫹
 //  @return     void
 //  @since      v1.0
 //  Sample usage:  Fit1(119,20);
@@ -251,9 +242,9 @@ void Fit1(int start,int num)
 
 float Get_angle(float Ax, float Ay, float Bx, float By, float Cx, float Cy)
 {
-    float BA = 0.00;//向量BA的模
+    float BA = 0.00;//閿熸枻鎷烽敓鏂ゆ嫹BA閿熸枻鎷锋ā
     float BC = 0.00;
-    float SBA_BC = 0.00;//向量点乘的值
+    float SBA_BC = 0.00;//閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熻锟�
     float angle = 0.00;
 
     BA = sqrt((Ax-Bx)*(Ax-Bx)+(Ay-By)*(Ay-By));
@@ -296,9 +287,9 @@ float Fit1_k(int start,int num)
         middle_NO[start-num+i] = a*i+b;
     }
 
-    float Y = 59-ImageStatus.OFFLine+10-1 - 59-ImageStatus.OFFLine+1;                          //求Y轴长度
-    float X = middle_NO[59-ImageStatus.OFFLine+10-1] - middle_NO[59-ImageStatus.OFFLine+1];    //求X轴长度(带方向)
-    float k = 1.00*(X/Y);                             //求斜率(以y轴为底)
+    float Y = 59-ImageStatus.OFFLine+10-1 - 59-ImageStatus.OFFLine+1;                          //閿熸枻鎷穀閿熺粨闀块敓鏂ゆ嫹
+    float X = middle_NO[59-ImageStatus.OFFLine+10-1] - middle_NO[59-ImageStatus.OFFLine+1];    //閿熸枻鎷稾閿熺粨闀块敓鏂ゆ嫹(閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�)
+    float k = 1.00*(X/Y);                             //閿熸枻鎷锋枩閿熸枻鎷�(閿熸枻鎷穣閿熸枻鎷蜂负閿熸枻鎷�)
     if(k<0)  k = k*-1;
     return k;
 }
@@ -319,12 +310,12 @@ void compressimage() {
       Image_Use[i][j] =mt9v03x_image[row][line];
     }
   }
-  mt9v03x_finish_flag = 0;  //使用完一帧DMA传输的图像图像  可以开始传输下一帧
+  mt9v03x_finish_flag = 0;  //浣块敓鏂ゆ嫹閿熸枻鎷蜂竴甯MA閿熸枻鎷烽敓鏂ゆ嫹閿熼叺纭锋嫹閿熼叺纭锋嫹閿燂拷  閿熸枻鎷烽敓鐨嗗尅鎷峰閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷蜂竴甯�
 }
 
 
-int HD_thre;  //临时观测变量
-//二值化
+int HD_thre;  //閿熸枻鎷锋椂閿熸璇ф嫹閿熸枻鎷烽敓锟�
+//閿熸枻鎷峰€奸敓鏂ゆ嫹
 void Get01change() {
   uint8 thre;
   uint8 i, j;
@@ -340,21 +331,21 @@ void Get01change() {
         thre = ImageStatus.Threshold_static;
 
       if (Image_Use[i][j] >
-          (thre))  //数值越大，显示的内容越多，较浅的图像也能显示出来
-        Pixle[i][j] = 1;  //白
+          (thre))  //閿熸枻鎷峰€艰秺閿熸枻鎷烽敓鏂ゆ嫹绀洪敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹瓒婇敓娲侊紝閿熸枻鎷锋祬閿熸枻鎷峰浘閿熸枻鎷蜂篃閿熸枻鎷烽敓鏂ゆ嫹绀洪敓鏂ゆ嫹閿熸枻鎷�
+        Pixle[i][j] = 1;  //閿熸枻鎷�
       else
-        Pixle[i][j] = 0;  //黑
+        Pixle[i][j] = 0;  //閿熸枻鎷�
     }
   }
 }
 
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      优化的大津法
-//  @param      image  图像数组
-//  @param      clo    宽
-//  @param      row    高
-//  @param      pixel_threshold 阈值分离
+//  @brief      閿熻剼浼欐嫹閿熶茎杈炬嫹閿燂拷
+//  @param      image  鍥鹃敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
+//  @param      clo    閿熸枻鎷�
+//  @param      row    閿熸枻鎷�
+//  @param      pixel_threshold 閿熸枻鎷峰€奸敓鏂ゆ嫹閿熸枻鎷�
 //  @return     uint8
 //  @since      2021.6.23
 //  Sample usage:
@@ -370,43 +361,45 @@ uint8 Threshold_deal(uint8* image,
   float pixelPro[GrayScale];
   int i, j, pixelSum = width * height;
   uint8 threshold = 0;
-  uint8* data = image;  //指向像素数据的指针
+  uint8* data = image;  //鎸囬敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鎹风鎷锋寚閿熸枻鎷�
   for (i = 0; i < GrayScale; i++) {
     pixelCount[i] = 0;
     pixelPro[i] = 0;
   }
 
   uint32 gray_sum = 0;
-  //统计灰度级中每个像素在整幅图像中的个数
+  //缁熼敓鐙＄伆搴︾》鎷烽敓鏂ゆ嫹姣忛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰浘閿熸枻鎷烽敓鍙殑闈╂嫹閿熸枻鎷�
   for (i = 0; i < height; i += 1) {
     for (j = 0; j < width; j += 1) {
       // if((sun_mode&&data[i*width+j]<pixel_threshold)||(!sun_mode))
       //{
-      pixelCount[(int)data[i * width + j]]++;  //将当前的点的像素值作为计数数组的下标
-      gray_sum += (int)data[i * width + j];  //灰度值总和
+      pixelCount[(
+          int)data[i * width + j]]++;  //閿熸枻鎷烽敓鏂ゆ嫹鍓嶉敓渚ョ鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓琛楃鎷烽敓杞款亷鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓閾版唻鎷�
+      gray_sum += (int)data[i * width + j];  //閿熸彮璁规嫹鍊奸敓鏉扮尨鎷�
       //}
     }
   }
 
-  //计算每个像素值的点在整幅图像中的比例
+  //閿熸枻鎷烽敓鏂ゆ嫹姣忛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鍊奸敓渚ョ鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鍥鹃敓鏂ゆ嫹閿熷彨鐨勬唻鎷烽敓鏂ゆ嫹
   for (i = 0; i < GrayScale; i++) {
     pixelPro[i] = (float)pixelCount[i] / pixelSum;
   }
 
 
-  //遍历灰度级[0,255]
+  //閿熸枻鎷烽敓鏂ゆ嫹閿熸彮搴︾》鎷穂0,255]
   float w0, w1, u0tmp, u1tmp, u0, u1, u, deltaTmp, deltaMax = 0;
   w0 = w1 = u0tmp = u1tmp = u0 = u1 = u = deltaTmp = 0;
   for (j = 0; j < pixel_threshold; j++) {
-    w0 += pixelPro[j];  //背景部分每个灰度值的像素点所占比例之和 即背景部分的比例
-    u0tmp += j * pixelPro[j];  //背景部分 每个灰度值的点的比例 *灰度值
+    w0 +=
+        pixelPro[j];  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹姣忛敓鏂ゆ嫹閿熸彮璁规嫹鍊奸敓鏂ゆ嫹閿熸枻鎷烽敓鎴鎷烽敓鏂ゆ嫹鍗犻敓鏂ゆ嫹閿熸枻鎷蜂箣閿熸枻鎷� 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻鐨勬唻鎷烽敓鏂ゆ嫹
+    u0tmp += j * pixelPro[j];  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹 姣忛敓鏂ゆ嫹閿熸彮璁规嫹鍊奸敓渚ョ鎷疯皨閿熸枻鎷烽敓锟� *閿熸彮璁规嫹鍊�
 
     w1 = 1 - w0;
     u1tmp = gray_sum / pixelSum - u0tmp;
 
-    u0 = u0tmp / w0;    //背景平均灰度
-    u1 = u1tmp / w1;    //前景平均灰度
-    u = u0tmp + u1tmp;  //全局平均灰度
+    u0 = u0tmp / w0;    //閿熸枻鎷烽敓鏂ゆ嫹骞抽敓鏂ゆ嫹閿熸彮璁规嫹
+    u1 = u1tmp / w1;    //鍓嶉敓鏂ゆ嫹骞抽敓鏂ゆ嫹閿熸彮璁规嫹
+    u = u0tmp + u1tmp;  //鍏ㄩ敓鏂ゆ嫹骞抽敓鏂ゆ嫹閿熸彮璁规嫹
     deltaTmp = w0 * pow((u0 - u), 2) + w1 * pow((u1 - u), 2);
     if (deltaTmp > deltaMax) {
       deltaMax = deltaTmp;
@@ -434,24 +427,25 @@ void Get01change_dajin() {
       else
         thre = ImageStatus.Threshold;
 
-      if (Image_Use[i][j] >(thre))         //数值越大，显示的内容越多，较浅的图像也能显示出来
-        Pixle[i][j] = 1;  //白
+      if (Image_Use[i][j] >(thre))         //閿熸枻鎷峰€艰秺閿熸枻鎷烽敓鏂ゆ嫹绀洪敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹瓒婇敓娲侊紝閿熸枻鎷锋祬閿熸枻鎷峰浘閿熸枻鎷蜂篃閿熸枻鎷烽敓鏂ゆ嫹绀洪敓鏂ゆ嫹閿熸枻鎷�
+        Pixle[i][j] = 1;  //閿熸枻鎷�
       else
-        Pixle[i][j] = 0;  //黑
+        Pixle[i][j] = 0;  //閿熸枻鎷�
     }
   }
 }
 
 
-//像素滤波
+//閿熸枻鎷烽敓鏂ゆ嫹閿熷壙璇ф嫹
 void Pixle_Filter() {
-  int nr;  //行
-  int nc;  //列
+  int nr;  //閿熸枻鎷�
+  int nc;  //閿熸枻鎷�
 
   for (nr = 10; nr < 40; nr++) {
     for (nc = 10; nc < 70; nc = nc + 1) {
-      if ((Pixle[nr][nc] == 0) && (Pixle[nr - 1][nc] + Pixle[nr + 1][nc] + Pixle[nr][nc + 1] + Pixle[nr][nc - 1] >= 3)) 
-      {
+      if ((Pixle[nr][nc] == 0) && (Pixle[nr - 1][nc] + Pixle[nr + 1][nc] +
+                                       Pixle[nr][nc + 1] + Pixle[nr][nc - 1] >=
+                                   3)) {
         Pixle[nr][nc] = 1;
       }
       //      else
@@ -463,7 +457,7 @@ void Pixle_Filter() {
   }
 }
 
-// 01解压图像
+// 01閿熸枻鎷峰帇鍥鹃敓鏂ゆ嫹
 //void uncompressimage() {
 //  int i = 0, j = 0, row = 0, line = 0;
 //  int div_h = uLCDH / LCDH;
@@ -476,7 +470,7 @@ void Pixle_Filter() {
 //    }
 //  }
 //}
-////灰度解压图像
+////閿熸彮搴︽枻鎷峰帇鍥鹃敓鏂ゆ嫹
 //void uncompressimageHD() {
 //  int i = 0, j = 0, row = 0, line = 0;
 //  int div_h = uLCDH / LCDH;
@@ -492,52 +486,52 @@ void Pixle_Filter() {
 //
 
 
-void GetJumpPointFromDet(uint8* p,uint8 type,int L,int H,JumpPointtypedef* Q)  //第一个参数是要查找的数组（80个点）
-                                                                               //第二个扫左边线还是扫右边线
-{                                                                              //三四是开始和结束点
+void GetJumpPointFromDet(uint8* p,uint8 type,int L,int H,JumpPointtypedef* Q)  //閿熸枻鎷蜂竴閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹瑕侀敓鏂ゆ嫹閿熸彮纰夋嫹閿熸枻鎷烽敓浠嬶紙80閿熸枻鎷烽敓濮愶級
+                                                                               //閿熻妭璁规嫹閿熸枻鎷锋壂閿熸枻鎷烽敓鏂ゆ嫹鍛嬮敓鏂ゆ嫹閿熺即顭掓嫹鍐堕敓鏂ゆ嫹閿燂拷
+{                                                                              //閿熸枻鎷烽敓鏂ゆ嫹閿熻鍖℃嫹濮嬮敓閰垫枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
   int i = 0;
-  if (type == 'L')                              //扫描左边线
+  if (type == 'L')                              //鎵敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
   {
     for (i = H; i >= L; i--) {
-      if (*(p + i) == 1 && *(p + i - 1) != 1)   //由黑变白
+      if (*(p + i) == 1 && *(p + i - 1) != 1)   //閿熺即榛戞唻鎷烽敓锟�
       {
-        Q->point = i;                           //记录左边线
-        Q->type = 'T';                          //正确跳变
+        Q->point = i;                           //閿熸枻鎷峰綍閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+        Q->type = 'T';                          //閿熸枻鎷风‘閿熸枻鎷烽敓鏂ゆ嫹
         break;
-      } else if (i == (L + 1))                  //若果扫到最后也没找到
+      } else if (i == (L + 1))                  //閿熸枻鎷烽敓鏂ゆ嫹鎵敓鏂ゆ嫹閿熸枻鎷烽敓鎻浼欐嫹涓氶敓锟�
       {
-        if (*(p + (L + H) / 2) != 0)            //如果中间是白的
+        if (*(p + (L + H) / 2) != 0)            //閿熸枻鎷烽敓鏂ゆ嫹灞戦敓鏂ゆ嫹鍓嶆閿燂拷
         {
-          Q->point = (L + H) / 2;               //认为左边线是中点
-          Q->type = 'W';                        //非正确跳变且中间为白，认为没有边
+          Q->point = (L + H) / 2;               //閿熸枻鎷蜂负閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹姊伴敓锟�
+          Q->type = 'W';                        //閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷彨纭锋嫹涓洪敓闃讹綇鎷烽敓鏂ゆ嫹涓烘病閿熷彨鎲嬫嫹
           break;
-        } else                                  //非正确跳变且中间为黑
+        } else                                  //閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷彨纭锋嫹涓洪敓鏂ゆ嫹
         {
-          Q->point = H;                         //如果中间是黑的
-          Q->type = 'H';                        //左边线直接最大值，认为是大跳变
+          Q->point = H;                         //閿熸枻鎷烽敓鏂ゆ嫹灞戦敓鏂ゆ嫹鍛涜瘶閿燂拷
+          Q->type = 'H';                        //閿熸枻鎷烽敓鏂ゆ嫹閿熻鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹鍊奸敓鏂ゆ嫹閿熸枻鎷蜂负閿熻杈炬嫹閿熸枻鎷烽敓鏂ゆ嫹
           break;
         }
       }
     }
-  } else if (type == 'R')                       //扫描右边线
+  } else if (type == 'R')                       //鎵敓鏂ゆ嫹閿熸彮鎲嬫嫹閿熸枻鎷�
   {
-    for (i = L; i <= H; i++)                    //从左往右扫
+    for (i = L; i <= H; i++)                    //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鎵�
     {
-      if (*(p + i) == 1 && *(p + i + 1) != 1)   //找由黑到白的跳变
+      if (*(p + i) == 1 && *(p + i + 1) != 1)   //閿熸枻鎷烽敓缂撮粦纰夋嫹閿熼樁纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹
       {
-        Q->point = i;                           //记录
+        Q->point = i;                           //閿熸枻鎷峰綍
         Q->type = 'T';
         break;
-      } else if (i == (H - 1))                  //若果扫到最后也没找到
+      } else if (i == (H - 1))                  //閿熸枻鎷烽敓鏂ゆ嫹鎵敓鏂ゆ嫹閿熸枻鎷烽敓鎻浼欐嫹涓氶敓锟�
       {
-        if (*(p + (L + H) / 2) != 0)            //如果中间是白的
+        if (*(p + (L + H) / 2) != 0)            //閿熸枻鎷烽敓鏂ゆ嫹灞戦敓鏂ゆ嫹鍓嶆閿燂拷
         {
-          Q->point = (L + H) / 2;               //右边线是中点
+          Q->point = (L + H) / 2;               //閿熸彮鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷彨纰夋嫹
           Q->type = 'W';
           break;
-        } else                                  //如果中点是黑的
+        } else                                  //閿熸枻鎷烽敓鏂ゆ嫹姊伴敓鏂ゆ嫹鍛涜瘶閿燂拷
         {
-          Q->point = L;                         //左边线直接最大值
+          Q->point = L;                         //閿熸枻鎷烽敓鏂ゆ嫹閿熻鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹鍊�
           Q->type = 'H';
           break;
         }
@@ -549,106 +543,99 @@ void GetJumpPointFromDet(uint8* p,uint8 type,int L,int H,JumpPointtypedef* Q)  /
 
 
 
-/*用是从一帧图像底部开始，检测路面边线（左右赛道边界），并在 ImageDeal 数组里记录最近 5 行的边界信息。
-这是自动驾驶/循迹摄像头图像处理的“首次线标定”*/
-uint8 DrawLinesFirst(void) {
-//static uint8 DrawLinesFirst(void) {                   //去掉了static；未去则导致文件函数不能被链接
-  PicTemp = Pixle[59];                                     //原本59  改成了57
-  if (*(PicTemp + ImageSensorMid) == 0)                 //如果底边图像中点为黑，异常情况
+
+static uint8 DrawLinesFirst(void) {
+  PicTemp = Pixle[59];                                     //鍘熼敓鏂ゆ嫹59  閿熶茎绛规嫹閿熸枻鎷�57
+  if (*(PicTemp + ImageSensorMid) == 0)                 //閿熸枻鎷烽敓鏂ゆ嫹濡嗛敓閰电》鎷烽敓鏂ゆ嫹姊伴敓杞款亷鎷峰啟閿熸枻鎷锋枑锝忔嫹閿熸枻鎷�
   {
-    for (Xsite = 0; Xsite < ImageSensorMid; Xsite++)    //找左右边线
+    for (Xsite = 0; Xsite < ImageSensorMid; Xsite++)    //閿熸枻鎷烽敓鏂ゆ嫹閿熸彮鎲嬫嫹閿熸枻鎷�
     {
-      //从中心点向左移动 Xsite 个像素
-      if (*(PicTemp + ImageSensorMid - Xsite) != 0)     //一旦找到左或右赛道到中心距离，就break
-        break; 
-      //从中心点向右移动 Xsite 个像素                    //并且记录Xsite
-      if (*(PicTemp + ImageSensorMid + Xsite) != 0)     //等价写法：PicTemp[ImageSensorMid] == 0。数组下标操作符 [] 本质也是指针运算：a[i] 等同于 *(a + i)。
+      if (*(PicTemp + ImageSensorMid - Xsite) != 0)     //涓€閿熸枻鎷烽敓鎻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鏈ㄩ敓鏂ゆ嫹鑰勵剨鎷烽敓绲檙eak
+        break;                                          //閿熸枻鎷烽敓鎻》鎷峰綍Xsite
+      if (*(PicTemp + ImageSensorMid + Xsite) != 0)
         break;
     }
 
-    if (*(PicTemp + ImageSensorMid - Xsite) != 0)       //赛道如果在左边的话
+    if (*(PicTemp + ImageSensorMid - Xsite) != 0)       //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓绔殑浼欐嫹
     {
-      BottomBorderRight = ImageSensorMid - Xsite + 1;   // 59行右边线有啦
-      for (Xsite = BottomBorderRight; Xsite > 0; Xsite--)  //开始找59行左边线
+      BottomBorderRight = ImageSensorMid - Xsite + 1;   // 59閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
+      for (Xsite = BottomBorderRight; Xsite > 0; Xsite--)  //閿熸枻鎷峰閿熸枻鎷�59閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
       {
         if (*(PicTemp + Xsite) == 0 &&
-            *(PicTemp + Xsite - 1) == 0)                //连续两个黑点，滤波
+            *(PicTemp + Xsite - 1) == 0)                //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻妭鐐癸紝閿熷壙璇ф嫹
         {
-          BottomBorderLeft = Xsite;                     //左边线找到
+          BottomBorderLeft = Xsite;                     //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷蜂笟閿燂拷
           break;
         } else if (Xsite == 1) {
-          BottomBorderLeft = 0;                         //搜索到最后了，看不到左边线，左边线认为是0
+          BottomBorderLeft = 0;                         //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯€嶉敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熺锝忔嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓杞款亷鎷烽敓锟�0
           break;
         }
       }
-    } else if (*(PicTemp + ImageSensorMid + Xsite) != 0)  //赛道如果在右边的话
+    } else if (*(PicTemp + ImageSensorMid + Xsite) != 0)  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰喍鍙╁箷閿燂拷
     {
-      BottomBorderLeft = ImageSensorMid + Xsite - 1;    // 59行左边线有啦
-      for (Xsite = BottomBorderLeft; Xsite < 79; Xsite++)  //开始找59行左边线
+      BottomBorderLeft = ImageSensorMid + Xsite - 1;    // 59閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
+      for (Xsite = BottomBorderLeft; Xsite < 79; Xsite++)  //閿熸枻鎷峰閿熸枻鎷�59閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
       {
         if (  *(PicTemp + Xsite) == 0
-            &&*(PicTemp + Xsite + 1) == 0)              //连续两个黑点，滤波
+            &&*(PicTemp + Xsite + 1) == 0)              //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻妭鐐癸紝閿熷壙璇ф嫹
         {
-          BottomBorderRight = Xsite;                    //右边线找到
+          BottomBorderRight = Xsite;                    //閿熸彮鎲嬫嫹閿熸枻鎷烽敓鎻鎷�
           break;
         } else if (Xsite == 78) {
-          BottomBorderRight = 79;                       //搜索到最后了，看不到右边线，左边线认为是79
+          BottomBorderRight = 79;                       //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯€嶉敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰喍閿熸枻鎷锋捀閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹涓洪敓鏂ゆ嫹79
           break;
         }
       }
     }
   }
-  else//else语句，只执行当if语句不成立时的那一段                                  //左边线中点是白的，比较正常的情况
+  else                                                //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋閿熸枻鎷峰墠妞庢ā閿熸枻鎷峰唹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
   {
-    for (Xsite = 79; Xsite >ImageSensorMid; Xsite--)   //一个点一个点地搜索右边线
+    for (Xsite = 79; Xsite >ImageSensorMid; Xsite--)   //涓€閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰喍閿熸枻鎷烽敓锟�
     {
       if (  *(PicTemp + Xsite) == 1
-          &&*(PicTemp + Xsite - 1) == 1)                //连续两个黑点，滤波     //两个白点
+          &&*(PicTemp + Xsite - 1) == 1)                //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻妭鐐癸紝閿熷壙璇ф嫹     //閿熸枻鎷烽敓鏂ゆ嫹閿熼樁纰夋嫹
       {
-        BottomBorderRight = Xsite;                      //找到就记录
+        BottomBorderRight = Xsite;                      //閿熸彮纰夋嫹閿熼叺纭锋嫹褰�
         break;
       } else if (Xsite == 40) {
-        BottomBorderRight = 39;                         //找不到认为79
+        BottomBorderRight = 39;                         //閿熸彮璇ф嫹閿熸枻鎷烽敓鏂ゆ嫹涓�79
         break;
       }
     }
-    for (Xsite = 0; Xsite < ImageSensorMid; Xsite++)    //一个点一个点地搜索左边线
+    for (Xsite = 0; Xsite < ImageSensorMid; Xsite++)    //涓€閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
     {
       if (  *(PicTemp + Xsite) == 1
-          &&*(PicTemp + Xsite + 1) == 1)                //连续两个黑点，滤波
+          &&*(PicTemp + Xsite + 1) == 1)                //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻妭鐐癸紝閿熷壙璇ф嫹
       {
-        BottomBorderLeft = Xsite;                       //找到就记录
+        BottomBorderLeft = Xsite;                       //閿熸彮纰夋嫹閿熼叺纭锋嫹褰�
         break;
       } else if (Xsite == 38) {
-        BottomBorderLeft = 39;                           //找不到认为0
+        BottomBorderLeft = 39;                           //閿熸彮璇ф嫹閿熸枻鎷烽敓鏂ゆ嫹涓�0
         break;
       }
     }
   }
-  BottomCenter =(BottomBorderLeft + BottomBorderRight) / 2;   // 59行中点直接取平均
-  ImageDeal[59].LeftBorder = BottomBorderLeft;                //在数组里面记录一下信息，第一行特殊一点而已
+  BottomCenter =(BottomBorderLeft + BottomBorderRight) / 2;   // 59閿熸枻鎷烽敓鍙鎷风洿閿熸枻鎷峰彇骞抽敓鏂ゆ嫹
+  ImageDeal[59].LeftBorder = BottomBorderLeft;                //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓閾板浼欐嫹閿熸枻鎷烽敓杈冾澁鎷烽敓鏂ゆ嫹閿熸彮浼欐嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸彮浼欐嫹閿熸枻鎷烽敓鏂ゆ嫹
   ImageDeal[59].RightBorder = BottomBorderRight;
-  ImageDeal[59].Center = BottomCenter;                        //确定最底边
-  ImageDeal[59].Wide = BottomBorderRight - BottomBorderLeft;  //存储宽度信息
+  ImageDeal[59].Center = BottomCenter;                        //纭敓鏂ゆ嫹閿熸枻鎷峰閿燂拷
+  ImageDeal[59].Wide = BottomBorderRight - BottomBorderLeft;  //閿熻姤鍌ㄩ敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鎭�
   ImageDeal[59].IsLeftFind = 'T';
   ImageDeal[59].IsRightFind = 'T';
-                                                              //(57)上面是第59行（自定义的扫得第一根线），下面是 从下往上 确定底边5行。
-                                                              // 58
-                                                              // 59
-  for (Ysite = 58; Ysite > 54; Ysite--)                       //由中间向两边确定底边五行
+  for (Ysite = 58; Ysite > 54; Ysite--)                       //閿熸枻鎷烽敓鍙》鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熼樁鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹
   {
     PicTemp = Pixle[Ysite];
-    for (Xsite = 79; Xsite > ImageDeal[Ysite + 1].Center;Xsite--)                                             //和前面一样的搜索
+    for (Xsite = 79; Xsite > ImageDeal[Ysite + 1].Center;Xsite--)                                             //閿熸枻鎷峰墠閿熸枻鎷蜂竴閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
     {
       if (*(PicTemp + Xsite) == 1 && *(PicTemp + Xsite - 1) == 1) {
-        ImageDeal[Ysite].RightBorder = Xsite;                                                               //此处是结构体ImageDealDatatypedef ImageDeal[60];//记录单行的信息
+        ImageDeal[Ysite].RightBorder = Xsite;
         break;
       } else if (Xsite == (ImageDeal[Ysite + 1].Center+1)) {
         ImageDeal[Ysite].RightBorder = ImageDeal[Ysite + 1].Center;
         break;
       }
     }
-    for (Xsite = 0; Xsite < ImageDeal[Ysite + 1].Center;Xsite++)                                             //和前面一样的搜索
+    for (Xsite = 0; Xsite < ImageDeal[Ysite + 1].Center;Xsite++)                                             //閿熸枻鎷峰墠閿熸枻鎷蜂竴閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
     {
       if (*(PicTemp + Xsite) == 1 && *(PicTemp + Xsite + 1) == 1) {
         ImageDeal[Ysite].LeftBorder = Xsite;
@@ -658,246 +645,236 @@ uint8 DrawLinesFirst(void) {
         break;
       }
     }
-    ImageDeal[Ysite].IsLeftFind = 'T';                        //这些信息存储到数组里
+    ImageDeal[Ysite].IsLeftFind = 'T';                        //閿熸枻鎷蜂簺閿熸枻鎷锋伅閿熻姤鍌ㄩ敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
     ImageDeal[Ysite].IsRightFind = 'T';
     ImageDeal[Ysite].Center =
-        (ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) /2; //存储中点
+        (ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) /2; //閿熻姤鍌ㄩ敓鍙鎷�
     ImageDeal[Ysite].Wide =
-        ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder;      //存储宽度
+        ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder;      //閿熻姤鍌ㄩ敓鏂ゆ嫹閿熸枻鎷�
   }
   return 'T';
-}                                                             //最基本的要求，最近的五行首先不会受到干扰，这需要在安装的时候调整摄像头的视角
-/*BottomBorderRight、BottomBorderLeft：先根据第 59 行搜边更新；用于算底行中点。
-BottomCenter：619 行赋值为 (BottomBorderLeft + BottomBorderRight) / 2。
-ImageDeal（image.h 里 extern ImageDeal[60]）：
+}                                                             //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鎻亷鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓楗鸿鎷烽敓鏂ゆ嫹閿熸澃纰夋嫹閿熸枻鎷烽敓鑴氾綇鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熻妭甯嫹瑁呴敓鏂ゆ嫹鏃堕敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓閰靛嚖鎷烽敓鏂ゆ嫹鍜忛敓锟�
 
-ImageDeal[59]：LeftBorder、RightBorder、Center、Wide、IsLeftFind、IsRightFind（620–625 行）。
-ImageDeal[58] … ImageDeal[55]：每行写入 RightBorder、LeftBorder、IsLeftFind、IsRightFind、Center、Wide（628–654 行）。
-只读、未写：Pixle 数组内容在此段不被改写，只读像素。*/
-
-
-
-/*从图像第55～OFFLine行（往上）逐行追踪左右赛道边线，
-完成整帧边线估计，包括“跳变修正”、“无边补线”和“上下层状态累积”。
-这是依据前5行（DrawLinesFirst() 得到）的基础边线、逐行扩展到更远处，构成完整边线跟踪。*/
-/*边线追逐大致得到全部边线*/
-void DrawLinesProcess(void)  //////不用更改
+/*閿熸枻鎷烽敓鏂ゆ嫹杩介敓鏂ゆ嫹閿熸枻鎷风鐜敓楗侯偓鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�*/
+static void DrawLinesProcess(void)  //////閿熸枻鎷烽敓鐭潻鎷烽敓鏂ゆ嫹
 {
-  uint8 L_Found_T = 'F';  //确定无边斜率的基准有边行是否被找到的标志
-  uint8 Get_L_line = 'F';  //找到这一帧图像的基准左斜率
-  uint8 R_Found_T = 'F';  //确定无边斜率的基准有边行是否被找到的标志
-  uint8 Get_R_line = 'F';  //找到这一帧图像的基准右斜率
-  float D_L = 0;           //延长线左边线斜率
-  float D_R = 0;           //延长线右边线斜率
-  int ytemp_W_L;           //记住首次左丢边行
-  int ytemp_W_R;           //记住首次右丢边行
-  ExtenRFlag = 0;          //标志位清0
+  uint8 L_Found_T = 'F';  //纭敓鏂ゆ嫹閿熺潾鎲嬫嫹鏂滈敓缁炵殑浼欐嫹鍑嗛敓鍙唻鎷烽敓鏂ゆ嫹閿熻鍑ゆ嫹閿熸彮纰夋嫹閿熶茎鎲嬫嫹蹇�
+  uint8 Get_L_line = 'F';  //閿熸彮纰夋嫹閿熸枻鎷蜂竴甯у浘閿熸枻鎷峰箷閿熼樁纭锋嫹閿熷彨鎲嬫嫹閿燂拷
+  uint8 R_Found_T = 'F';  //纭敓鏂ゆ嫹閿熺潾鎲嬫嫹鏂滈敓缁炵殑浼欐嫹鍑嗛敓鍙唻鎷烽敓鏂ゆ嫹閿熻鍑ゆ嫹閿熸彮纰夋嫹閿熶茎鎲嬫嫹蹇�
+  uint8 Get_R_line = 'F';  //閿熸彮纰夋嫹閿熸枻鎷蜂竴甯у浘閿熸枻鎷峰箷閿熼樁纭锋嫹閿熷彨鎲嬫嫹閿燂拷
+  float D_L = 0;           //閿熸帴绛规嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鍙唻鎷烽敓锟�
+  float D_R = 0;           //閿熸帴绛规嫹閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹鏂滈敓鏂ゆ嫹
+  int ytemp_W_L;           //閿熸枻鎷蜂綇閿熼樁杈炬嫹閿熻涓㈡唻鎷烽敓鏂ゆ嫹
+  int ytemp_W_R;           //閿熸枻鎷蜂綇閿熼樁杈炬嫹閿熸彮璁规嫹閿熸枻鎷烽敓鏂ゆ嫹
+  ExtenRFlag = 0;          //閿熸枻鎷峰織浣嶉敓鏂ゆ嫹0
   ExtenLFlag = 0;
    ImageStatus.Left_Line = 0;
    ImageStatus.WhiteLine = 0;
    ImageStatus.Right_Line = 0;
-  for (Ysite = 54 ; Ysite > ImageStatus.OFFLine; Ysite--)            //前5行处理过了，下面从55行到（设定的不处理的行OFFLine）
-  {                        //太远的图像不稳定，OFFLine以后的不处理
+  for (Ysite = 54 ; Ysite > ImageStatus.OFFLine; Ysite--)            //鍓�5閿熷彨杈炬嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷壙锝忔嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷55閿熷彨纰夋嫹閿熸枻鎷烽敓鍊熷畾閿熶茎璇ф嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹OFFLine閿熸枻鎷�
+  {                        //澶繙閿熸枻鎷峰浘閿熸枻鎷烽敓楗鸿鎷烽敓鏂ゆ嫹OFFLine閿熺殕鐚存嫹鐗熼敓鏂ゆ嫹閿熸枻鎷烽敓锟�
     PicTemp = Pixle[Ysite];
-    JumpPointtypedef JumpPoint[2];                                          // 0左1右
+    JumpPointtypedef JumpPoint[2];                                          // 0閿熸枻鎷�1閿熸枻鎷�
     if (ImageStatus.Road_type != Cross_ture
-        /* &&SystemData.SpeedData.Length*OX>500*/) {
-      IntervalLow =ImageDeal[Ysite + 1].RightBorder -ImageScanInterval;             //从上一行右边线-Interval的点开始（确定扫描开始点）
-      IntervalHigh =ImageDeal[Ysite + 1].RightBorder + ImageScanInterval;           //到上一行右边线+Interval的点结束（确定扫描结束点）
+           /* &&SystemData.SpeedData.Length*OX>500*/) {
+      IntervalLow =ImageDeal[Ysite + 1].RightBorder -ImageScanInterval;             //閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹-Interval閿熶茎鐐瑰紑濮嬮敓鏂ゆ嫹纭敓鏂ゆ嫹鎵敓鍊熷紑濮嬮敓濮愶級
+      IntervalHigh =ImageDeal[Ysite + 1].RightBorder + ImageScanInterval;           //閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹+Interval閿熶茎纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熼ズ鍑ゆ嫹閿熺即顭掓嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷锛�
     } else {
-      IntervalLow =ImageDeal[Ysite + 1].RightBorder -ImageScanInterval_Cross;       //从上一行右边线-Interval_Cross的点开始（确定扫描开始点）
-      IntervalHigh = ImageDeal[Ysite + 1].RightBorder + ImageScanInterval_Cross;    //到上一行右边线+Interval_Cross的点开始（确定扫描开始点）
+      IntervalLow =ImageDeal[Ysite + 1].RightBorder -ImageScanInterval_Cross;       //閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹-Interval_Cross閿熶茎鐐瑰紑濮嬮敓鏂ゆ嫹纭敓鏂ゆ嫹鎵敓鍊熷紑濮嬮敓濮愶級
+      IntervalHigh = ImageDeal[Ysite + 1].RightBorder + ImageScanInterval_Cross;    //閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹+Interval_Cross閿熶茎鐐瑰紑濮嬮敓鏂ゆ嫹纭敓鏂ゆ嫹鎵敓鍊熷紑濮嬮敓濮愶級
     }
 
-    LimitL(IntervalLow);   //确定左扫描区间并进行限制
-    LimitH(IntervalHigh);  //确定右扫描区间并进行限制
-    GetJumpPointFromDet(PicTemp, 'R', IntervalLow, IntervalHigh,&JumpPoint[1]);     //扫右边线
+    LimitL(IntervalLow);   //纭敓鏂ゆ嫹閿熸枻鎷锋壂閿熸枻鎷烽敓鏂ゆ嫹閿熸垝骞堕敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+    LimitH(IntervalHigh);  //纭敓鏂ゆ嫹閿熸枻鎷锋壂閿熸枻鎷烽敓鏂ゆ嫹閿熸垝骞堕敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+    GetJumpPointFromDet(PicTemp, 'R', IntervalLow, IntervalHigh,&JumpPoint[1]);     //鎵敓鎻唻鎷烽敓鏂ゆ嫹
 
-    IntervalLow =ImageDeal[Ysite + 1].LeftBorder -ImageScanInterval;                //从上一行左边线-5的点开始（确定扫描开始点）
-    IntervalHigh =ImageDeal[Ysite + 1].LeftBorder +ImageScanInterval;               //到上一行左边线+5的点结束（确定扫描结束点）
+    IntervalLow =ImageDeal[Ysite + 1].LeftBorder -ImageScanInterval;                //閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�-5閿熶茎鐐瑰紑濮嬮敓鏂ゆ嫹纭敓鏂ゆ嫹鎵敓鍊熷紑濮嬮敓濮愶級
+    IntervalHigh =ImageDeal[Ysite + 1].LeftBorder +ImageScanInterval;               //閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�+5閿熶茎纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熼ズ鍑ゆ嫹閿熺即顭掓嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷锛�
 
-    LimitL(IntervalLow);   //确定左扫描区间并进行限制
-    LimitH(IntervalHigh);  //确定右扫描区间并进行限制
+    LimitL(IntervalLow);   //纭敓鏂ゆ嫹閿熸枻鎷锋壂閿熸枻鎷烽敓鏂ゆ嫹閿熸垝骞堕敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+    LimitH(IntervalHigh);  //纭敓鏂ゆ嫹閿熸枻鎷锋壂閿熸枻鎷烽敓鏂ゆ嫹閿熸垝骞堕敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
     GetJumpPointFromDet(PicTemp, 'L', IntervalLow, IntervalHigh,&JumpPoint[0]);
 
-    if (JumpPoint[0].type =='W')                                                    //如果本行左边线不正常跳变，即这10个点都是白的
+    if (JumpPoint[0].type =='W')                                                    //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓绔鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸垝锛岄敓鏂ゆ嫹閿熸枻鎷�10閿熸枻鎷烽敓濮愰兘閿熻鐧界鎷�
     {
-      ImageDeal[Ysite].LeftBorder =ImageDeal[Ysite + 1].LeftBorder;                 //本行左边线沿用上一行的数值
-    } else {                                                                         //左边线正常（'T'）
-      ImageDeal[Ysite].LeftBorder = JumpPoint[0].point;                             //记录下来啦
+      ImageDeal[Ysite].LeftBorder =ImageDeal[Ysite + 1].LeftBorder;                 //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸彮浼欐嫹姊伴敓鏂ゆ嫹閿熻锟�
+    } else                                                                          //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+    {
+      ImageDeal[Ysite].LeftBorder = JumpPoint[0].point;                             //閿熸枻鎷峰綍閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
     }
 
-    if (JumpPoint[1].type == 'W')                                                   //如果本行右边线不正常跳变
+    if (JumpPoint[1].type == 'W')                                                   //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鍐堕敓鏂ゆ嫹鍗熼敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
     {
-      ImageDeal[Ysite].RightBorder =ImageDeal[Ysite + 1].RightBorder;               //本行右边线沿用上一行的数值
-    } else {                                                                          //右边线正常（'T'）
-      ImageDeal[Ysite].RightBorder = JumpPoint[1].point;                            //记录下来啦
+      ImageDeal[Ysite].RightBorder =ImageDeal[Ysite + 1].RightBorder;               //閿熸枻鎷烽敓鏂ゆ嫹閿熸彮鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷蜂竴閿熷彨纰夋嫹閿熸枻鎷峰€�
+    } else                                                                          //閿熸彮鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+    {
+      ImageDeal[Ysite].RightBorder = JumpPoint[1].point;                            //閿熸枻鎷峰綍閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
     }
 
-    ImageDeal[Ysite].IsLeftFind =JumpPoint[0].type;                                 //记录本行是否找到边线，即边线类型
+    ImageDeal[Ysite].IsLeftFind =JumpPoint[0].type;                                 //閿熸枻鎷峰綍閿熸枻鎷烽敓鏂ゆ嫹閿熻鍑ゆ嫹閿熸彮纰夋嫹閿熸枻鎷烽敓绔綇鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
     ImageDeal[Ysite].IsRightFind = JumpPoint[1].type;
 
-
-    //重新确定那些大跳变的边缘-------------------可抽象为：发现了跳变但跳得太猛（异常大跳变）
+    //閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熸枻鎷蜂簺閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯皨閿熺殕锟�
     if (( ImageDeal[Ysite].IsLeftFind == 'H'
-        ||ImageDeal[Ysite].IsRightFind == 'H')) 
-    {
-      if (ImageDeal[Ysite].IsLeftFind == 'H')                                   //如果左边线大跳变
+         ||ImageDeal[Ysite].IsRightFind == 'H')) {
+      if (ImageDeal[Ysite].IsLeftFind == 'H')                                   //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓绔揪鎷烽敓鏂ゆ嫹閿熸枻鎷�
         for (Xsite = (ImageDeal[Ysite].LeftBorder + 1);
-            Xsite <= (ImageDeal[Ysite].RightBorder - 1);
-            Xsite++)                                                           //左右边线之间重新扫描
-      {
-        if ((*(PicTemp + Xsite) == 0) && (*(PicTemp + Xsite + 1) != 0)) {
-            ImageDeal[Ysite].LeftBorder =Xsite;                                 //如果上一行左边线的右边有“黑白跳变”则为绝对边线直接取出
+             Xsite <= (ImageDeal[Ysite].RightBorder - 1);
+             Xsite++)                                                           //閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹涔嬮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鎵敓鏂ゆ嫹
+        {
+          if ((*(PicTemp + Xsite) == 0) && (*(PicTemp + Xsite + 1) != 0)) {
+            ImageDeal[Ysite].LeftBorder =Xsite;                                 //閿熸枻鎷烽敓鏂ゆ嫹閿熸彮浼欐嫹閿熸枻鎷烽敓鏂ゆ嫹閿熺纰夋嫹閿熸彮鎲嬫嫹閿熷彨榛戝府鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹涓洪敓鏂ゆ嫹閿熺殕鎲嬫嫹閿熸枻鎷风洿閿熸枻鎷峰彇閿熸枻鎷�
             ImageDeal[Ysite].IsLeftFind = 'T';
             break;
-        } else if (*(PicTemp + Xsite) != 0)                                   //一旦出现白点则直接跳出
+          } else if (*(PicTemp + Xsite) != 0)                                   //涓€閿熸枻鎷烽敓鏂ゆ嫹閿熻鐧界鎷烽敓鏂ゆ嫹鐩撮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
             break;
           else if (Xsite ==(ImageDeal[Ysite].RightBorder - 1))
-        {
-            ImageDeal[Ysite].IsLeftFind = 'T';
-            break;
-        }
-      }
-      if ((ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder) <= 7)                              //图像宽度限定
-      {
-        ImageStatus.OFFLine = Ysite + 1;  //如果这行比7小了后面直接不要了
-        break;
-      }
-
-      if (ImageDeal[Ysite].IsRightFind == 'H')                                //如果右边线大跳变
-        for (Xsite = (ImageDeal[Ysite].RightBorder - 1);
-            Xsite >= (ImageDeal[Ysite].LeftBorder + 1); Xsite--) {
-          if ((*(PicTemp + Xsite) == 0) && (*(PicTemp + Xsite - 1) != 0)) {     //”黑白跳变“
-              ImageDeal[Ysite].RightBorder = Xsite;                    //如果右边线的左边还有“黑白跳变”则为绝对边线直接取出
-              ImageDeal[Ysite].IsRightFind = 'T';
-              break;
-          } else if (*(PicTemp + Xsite) != 0)                           //一旦出现白点则直接跳出
-              break;
-            else if (Xsite == (ImageDeal[Ysite].LeftBorder + 1))
           {
-              ImageDeal[Ysite].RightBorder = Xsite;
-              ImageDeal[Ysite].IsRightFind = 'T';
-              break;
+             ImageDeal[Ysite].IsLeftFind = 'T';
+            break;
           }
         }
-     }
+      if ((ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder) <=
+          7)                              //鍥鹃敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹钖呴敓锟�
+      {
+        ImageStatus.OFFLine = Ysite + 1;  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋枩閿燂拷7灏忛敓鍓跨尨鎷烽敓鏂ゆ嫹鐩撮敓鎺ヨ鎷疯閿熸枻鎷�
+        break;
+      }
+      if (ImageDeal[Ysite].IsRightFind == 'H')
+        for (Xsite = (ImageDeal[Ysite].RightBorder - 1);
+             Xsite >= (ImageDeal[Ysite].LeftBorder + 1); Xsite--) {
+          if ((*(PicTemp + Xsite) == 0) && (*(PicTemp + Xsite - 1) != 0)) {
+            ImageDeal[Ysite].RightBorder =
+                Xsite;                    //閿熸枻鎷烽敓鏂ゆ嫹鍐堕敓鏂ゆ嫹鍙╅敓鏂ゆ嫹閿熺浼欐嫹閿熷彨榛戝府鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹涓洪敓鏂ゆ嫹閿熺殕鎲嬫嫹閿熸枻鎷风洿閿熸枻鎷峰彇閿熸枻鎷�
+            ImageDeal[Ysite].IsRightFind = 'T';
+            break;
+          } else if (*(PicTemp + Xsite) != 0)
+            break;
+          else if (Xsite == (ImageDeal[Ysite].LeftBorder + 1))
+          {
+            ImageDeal[Ysite].RightBorder = Xsite;
+            ImageDeal[Ysite].IsRightFind = 'T';
+            break;
+          }
+        }
+    }
 
-     /***********重新确定无边行************/
+ /***********閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熺潾鎲嬫嫹閿熸枻鎷�************/
     int ysite = 0;
     uint8 L_found_point = 0;
     uint8 R_found_point = 0;
 
-    #if 0
+
     if(  ImageStatus.Road_type != Ramp)
     {
-      if (    ImageDeal[Ysite].IsRightFind == 'W'
+    if (    ImageDeal[Ysite].IsRightFind == 'W'
           &&Ysite > 10
           &&Ysite < 50
           &&ImageStatus.Road_type!=Barn_in
-          )                     //最早出现的无边行
+          )                     //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰€奸敓鏂ゆ嫹钖囬敓鏂ゆ嫹閿燂拷
+    {
+      if (Get_R_line == 'F')    //閿熸枻鎷蜂竴甯у浘閿熸枻鎷锋病閿熸枻鎷烽敓鏉扮櫢鎷烽敓鏂ゆ嫹閿熸枻鎷蜂竴閿熼樁纭锋嫹鍙╂媷閿熸枻鎷烽敓杞胯鎷烽敓鏂ゆ嫹閿熸枻鎷�
       {
-      if (Get_R_line == 'F')    //这一帧图像没有跑过这个找基准线的代码段才运行
-      {
-          Get_R_line = 'T';       //找了  一帧图像只跑一次 置为T
-          ytemp_W_R = Ysite + 2;
-          for (ysite = Ysite + 1; ysite < Ysite + 15; ysite++) {
-          if (ImageDeal[ysite].IsRightFind =='T')  //往无边行下面搜索  一般都是有边的
-              R_found_point++;
-          }
-          if (R_found_point >8)                      //找到基准斜率边  做延长线重新确定无边   当有边的点数大于8
-          {
+        Get_R_line = 'T';       //閿熸枻鎷烽敓鏂ゆ嫹  涓€甯у浘閿熸枻鎷峰彧閿熸枻鎷蜂竴閿熸枻鎷� 閿熸枻鎷蜂负T
+        ytemp_W_R = Ysite + 2;
+        for (ysite = Ysite + 1; ysite < Ysite + 15; ysite++) {
+          if (ImageDeal[ysite].IsRightFind =='T')  //閿熸枻鎷烽敓鐫唻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹  涓€閿熷閮介敓鏂ゆ嫹閿熷彨杈圭鎷�
+            R_found_point++;
+        }
+        if (R_found_point >8)                      //閿熸彮纰夋嫹閿熸枻鎷峰噯鏂滈敓缁炴唻鎷�  閿熸枻鎷烽敓鎺ョ鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熺潾鎲嬫嫹   閿熸枻鎷烽敓鍙竟鐨勭鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹8
+        {
           D_R = ((float)(ImageDeal[Ysite + R_found_point].RightBorder - ImageDeal[Ysite + 3].RightBorder)) /((float)(R_found_point - 3));
-                                                  //求下面这些点连起来的斜率
-                                                  //好给无边行做延长线左个基准
+                                                  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹浜涢敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鏂滈敓鏂ゆ嫹
+                                                  //閿熺煫闈╂嫹閿熺潾鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸帴绛规嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓闃讹拷
           if (D_R > 0) {
-              R_Found_T ='T';                       //如果斜率大于0  那么找到了这个基准行  因为梯形畸变
-                                                  //所以一般情况都是斜率大于0  小于0的情况也不用延长 没必要
+            R_Found_T ='T';                       //閿熸枻鎷烽敓鍙唻鎷疯殌閿熸枻鎷烽敓锟�0  閿熸枻鎷蜂箞閿熸彮纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓闃剁》鎷烽敓锟�  閿熸枻鎷蜂负閿熸枻鎷烽敓杞夸紮鎷烽敓鏂ゆ嫹
+                                                  //閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷彨鎲嬫嫹铓€閿熸枻鎷烽敓锟�0  灏忛敓鏂ゆ嫹0閿熸枻鎷烽敓鏂ゆ嫹閿熸彮璇ф嫹閿熸枻鎷烽敓鏂ゆ嫹鏄犻敓锟� 娌￠敓鏂ゆ嫹瑕�
           } else {
-              R_Found_T = 'F';                      //没有找到这个基准行
-              if (D_R < 0)
-              ExtenRFlag = 'F';                   //这个标志位用于十字角点补线  防止图像误补用的
+            R_Found_T = 'F';                      //娌￠敓鏂ゆ嫹閿熸彮纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熼樁纭锋嫹閿燂拷
+            if (D_R < 0)
+              ExtenRFlag = 'F';                   //閿熸枻鎷烽敓鏂ゆ嫹閿熻鐤氫紮鎷烽敓鏂ゆ嫹閿熺粸顕嗘嫹绾稿爲鎮寸櫢鎷烽敓锟�  閿熸枻鎷锋鍥鹃敓鏂ゆ嫹閿熸枻鎷烽敓鐭鎷�
           }
-          }
+        }
       }
       if (R_Found_T == 'T')
-          ImageDeal[Ysite].RightBorder =ImageDeal[ytemp_W_R].RightBorder -D_R * (ytemp_W_R - Ysite);  //如果找到了 那么以基准行做延长线
+        ImageDeal[Ysite].RightBorder =ImageDeal[ytemp_W_R].RightBorder -D_R * (ytemp_W_R - Ysite);  //閿熸枻鎷烽敓鏂ゆ嫹涓氶敓鏂ゆ嫹閿燂拷 閿熸枻鎷蜂箞閿熺殕浼欐嫹鍑嗛敓鏂ゆ嫹閿熸枻鎷烽敓鎺ョ鎷烽敓鏂ゆ嫹
 
-      LimitL(ImageDeal[Ysite].RightBorder);  //限幅
-      LimitH(ImageDeal[Ysite].RightBorder);  //限幅
-      }
+      LimitL(ImageDeal[Ysite].RightBorder);  //閿熺潾鍑ゆ嫹
+      LimitH(ImageDeal[Ysite].RightBorder);  //閿熺潾鍑ゆ嫹
+    }
 
-      if (ImageDeal[Ysite].IsLeftFind == 'W' && Ysite > 10 && Ysite < 50 &&
-          ImageStatus.Road_type != Barn_in)    //下面同理  左边界
-      {
+    if (ImageDeal[Ysite].IsLeftFind == 'W' && Ysite > 10 && Ysite < 50 &&
+        ImageStatus.Road_type != Barn_in)    //閿熸枻鎷烽敓鏂ゆ嫹鍚岄敓鏂ゆ嫹  閿熸枻鎷峰憮閿燂拷
+    {
       if (Get_L_line == 'F') {
-          Get_L_line = 'T';
-          ytemp_W_L = Ysite + 2;
-          for (ysite = Ysite + 1; ysite < Ysite + 15; ysite++) {
+        Get_L_line = 'T';
+        ytemp_W_L = Ysite + 2;
+        for (ysite = Ysite + 1; ysite < Ysite + 15; ysite++) {
           if (ImageDeal[ysite].IsLeftFind == 'T')
-              L_found_point++;
-          }
-          if (L_found_point > 8)              //找到基准斜率边  做延长线重新确定无边
-          {
+            L_found_point++;
+        }
+        if (L_found_point > 8)              //閿熸彮纰夋嫹閿熸枻鎷峰噯鏂滈敓缁炴唻鎷�  閿熸枻鎷烽敓鎺ョ鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熺潾鎲嬫嫹
+        {
           D_L = ((float)(ImageDeal[Ysite + 3].LeftBorder -ImageDeal[Ysite + L_found_point].LeftBorder)) /((float)(L_found_point - 3));
           if (D_L > 0) {
-              L_Found_T = 'T';
+            L_Found_T = 'T';
 
           } else {
-              L_Found_T = 'F';
-              if (D_L < 0)
+            L_Found_T = 'F';
+            if (D_L < 0)
               ExtenLFlag = 'F';
           }
-          }
+        }
       }
 
       if (L_Found_T == 'T')
-          ImageDeal[Ysite].LeftBorder =ImageDeal[ytemp_W_L].LeftBorder + D_L * (ytemp_W_L - Ysite);
+        ImageDeal[Ysite].LeftBorder =ImageDeal[ytemp_W_L].LeftBorder + D_L * (ytemp_W_L - Ysite);
 
-      LimitL(ImageDeal[Ysite].LeftBorder);  //限幅
-      LimitH(ImageDeal[Ysite].LeftBorder);  //限幅
-      }
+      LimitL(ImageDeal[Ysite].LeftBorder);  //閿熺潾鍑ゆ嫹
+      LimitH(ImageDeal[Ysite].LeftBorder);  //閿熺潾鍑ゆ嫹
     }
-     #endif
-    //统计丢边行数
+}
     if (ImageDeal[Ysite].IsLeftFind == 'W'&&ImageDeal[Ysite].IsRightFind == 'W')
-        {
-            ImageStatus.WhiteLine++;  //要是左右都无边，丢边数+1
-        }
+         {
+             ImageStatus.WhiteLine++;  //瑕侀敓鏂ゆ嫹閿熸枻鎷烽敓鎻鎷烽敓鐫竟锝忔嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�+1
+         }
         if (ImageDeal[Ysite].IsLeftFind == 'W'&&Ysite<55)
         {
-            ImageStatus.Left_Line++;
+             ImageStatus.Left_Line++;
         }
         if (ImageDeal[Ysite].IsRightFind == 'W'&&Ysite<55)
         {
-            ImageStatus.Right_Line++;
+             ImageStatus.Right_Line++;
         }
 
-    
-    LimitL(ImageDeal[Ysite].LeftBorder);   //限幅
-    LimitH(ImageDeal[Ysite].LeftBorder);   //限幅
-    LimitL(ImageDeal[Ysite].RightBorder);  //限幅
-    LimitH(ImageDeal[Ysite].RightBorder);  //限幅
-    
-    ImageDeal[Ysite].Wide =ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder;
-    ImageDeal[Ysite].Center =(ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) / 2;
 
-    if (ImageDeal[Ysite].Wide <= 7)         //重新确定可视距离
+      LimitL(ImageDeal[Ysite].LeftBorder);   //閿熺潾鍑ゆ嫹
+      LimitH(ImageDeal[Ysite].LeftBorder);   //閿熺潾鍑ゆ嫹
+      LimitL(ImageDeal[Ysite].RightBorder);  //閿熺潾鍑ゆ嫹
+      LimitH(ImageDeal[Ysite].RightBorder);  //閿熺潾鍑ゆ嫹
+
+      ImageDeal[Ysite].Wide =ImageDeal[Ysite].RightBorder - ImageDeal[Ysite].LeftBorder;
+      ImageDeal[Ysite].Center =(ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) / 2;
+
+    if (ImageDeal[Ysite].Wide <= 7)         //閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熸枻鎷烽敓鎺ユ拝鎷烽敓鏂ゆ嫹
     {
       ImageStatus.OFFLine = Ysite + 1;
       break;
-    } else if (  ImageDeal[Ysite].RightBorder <= 10 ||ImageDeal[Ysite].LeftBorder >= 70) {
-      ImageStatus.OFFLine = Ysite + 1;
-      break;
-    }                                        //当图像宽度小于0或者左右边达到一定的限制时，则终止巡边
-   }
+    }
+
+    else if (  ImageDeal[Ysite].RightBorder <= 10
+             ||ImageDeal[Ysite].LeftBorder >= 70) {
+              ImageStatus.OFFLine = Ysite + 1;
+              break;
+    }                                        //閿熸枻鎷峰浘閿熸枻鎷烽敓鏂ゆ嫹閿熷彨鈽呮嫹閿燂拷0閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鎻竟杈惧埌涓€閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鏃堕敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹姝㈠贰閿熸枻鎷�
+  }
 
 
   return;
 }
 
-//延长线绘制，理论上来说是很准确的
-static void DrawExtensionLine(void)        //绘制延长线并重新确定中线 ，把补线补成斜线
+//閿熸帴绛规嫹閿熺浼欐嫹閿熺嫛锝忔嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹璇撮敓瑙掔尨鎷峰噯纭敓鏂ゆ嫹
+static void DrawExtensionLine(void)        //閿熸枻鎷烽敓鏂ゆ嫹閿熸帴绛规嫹閿熺璇ф嫹閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹 閿熸枻鎷烽敓绐栬鎷烽敓绔鎷烽敓鏂ゆ嫹鏂滈敓鏂ゆ嫹
 {
   if ((
         ImageStatus.Road_type != Barn_in
@@ -905,7 +882,7 @@ static void DrawExtensionLine(void)        //绘制延长线并重新确定中�
 //        &&ImageStatus.pansancha_Lenth* OX==0
         &&ImageStatus.Road_type !=LeftCirque
         &&ImageStatus.Road_type !=RightCirque
-        )                                  // g5.22  6.22调试注释  记得改回来
+        )                                  // g5.22  6.22閿熸枻鎷烽敓鏂ゆ嫹娉ㄩ敓鏂ゆ嫹  閿熻寰楁敼浼欐嫹閿熸枻鎷�
   {
     if (ImageStatus.WhiteLine >= ImageStatus.TowPoint_True - 15)
       TFSite = 55;
@@ -913,31 +890,31 @@ static void DrawExtensionLine(void)        //绘制延长线并重新确定中�
 //      TFSite = 55;
     if (ExtenLFlag != 'F')
       for (Ysite = 54; Ysite >= (ImageStatus.OFFLine + 4);
-           Ysite--)                       //从第五行开始网上扫扫到顶边下面两行   多段补线
-                                          //不仅仅只有一段
+           Ysite--)                       //閿熸帴纰夋嫹閿熸枻鎷烽敓鍙尅鎷峰閿熸枻鎷烽敓鏂ゆ嫹鎵壂閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�   閿熸枻鎷峰熬閿熸枻鎷烽敓锟�
+                                          //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰彧閿熸枻鎷蜂竴閿熸枻鎷�
       {
-        PicTemp = Pixle[Ysite];           //存当前行
-        if (ImageDeal[Ysite].IsLeftFind =='W')                          //如果本行左边界没扫到但扫到的是白色，说明本行没有左边界点
+        PicTemp = Pixle[Ysite];           //閿熻姤褰撳墠閿熸枻鎷�
+        if (ImageDeal[Ysite].IsLeftFind =='W')                          //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熺鏂ゆ嫹娌℃壂閿熸枻鎷烽敓鏂ゆ嫹鎵敓鏂ゆ嫹閿熸枻鎷烽敓瑙掑府鎷疯壊閿熸枻鎷疯閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋病閿熸枻鎷烽敓鏂ゆ嫹鍛撻敓鏂ゆ嫹
         {
           //**************************************************//**************************************************
-          if (ImageDeal[Ysite + 1].LeftBorder >= 70)                    //如果左边界实在是太右边
+          if (ImageDeal[Ysite + 1].LeftBorder >= 70)                    //閿熸枻鎷烽敓鏂ゆ嫹閿熺鏂ゆ嫹瀹為敓鏂ゆ嫹閿熸枻鎷峰お閿熸彮鎲嬫嫹
           {
             ImageStatus.OFFLine = Ysite + 1;
-            break;                        //直接跳出（极端情况）
+            break;                        //鐩撮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
           }
           //************************************************//*************************************************
 
-          while (Ysite >= (ImageStatus.OFFLine + 4))                    //此时还没扫到顶边
+          while (Ysite >= (ImageStatus.OFFLine + 4))                    //閿熸枻鎷锋椂閿熸枻鎷锋病鎵敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
           {
-            Ysite--;                      //继续往上扫
+            Ysite--;                      //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鎵�
             if (  ImageDeal[Ysite].IsLeftFind == 'T'
                 &&ImageDeal[Ysite - 1].IsLeftFind == 'T'
                 &&ImageDeal[Ysite - 2].IsLeftFind == 'T'
                 &&ImageDeal[Ysite - 2].LeftBorder > 0
                 &&ImageDeal[Ysite - 2].LeftBorder <70
-                )                                                       //如果扫到本行出现了并且本行以上连续三行都有左边界点（左边界在空白上方）
+                )                                                       //閿熸枻鎷烽敓缂搭煉鎷烽敓鏂ゆ嫹閿熸枻鎷疯皭閿熸枻鎷烽敓鏂ゆ嫹鐬敓鏂ゆ嫹鍐堕敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鍗搁敓鏂ゆ嫹閿熸枻鎷烽敓绔枻鎷锋倴顭掓嫹閿熺鏂ゆ嫹閿熻妭绌哄府鎷烽敓杈冨嚖鎷烽敓鏂ゆ嫹
             {
-              FTSite = Ysite - 2;          //把本行上面的第二行存入FTsite
+              FTSite = Ysite - 2;          //閿熺獤鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷风墶璇欓敓鏂ゆ嫹鍐欓敓鏂ゆ嫹閿熺唇Tsite
               break;
             }
           }
@@ -945,18 +922,18 @@ static void DrawExtensionLine(void)        //绘制延长线并重新确定中�
           DetL =
               ((float)(ImageDeal[FTSite].LeftBorder -
                        ImageDeal[TFSite].LeftBorder)) /
-              ((float)(FTSite - TFSite));  //左边界的斜率：列的坐标差/行的坐标差
+              ((float)(FTSite - TFSite));  //閿熸枻鎷峰憮閿熸枻鎷锋枩閿熺粸锝忔嫹閿熷彨纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷/閿熷彨纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
           if (FTSite > ImageStatus.OFFLine)
             for (
-                ytemp = TFSite; ytemp >= FTSite; ytemp--)               //从第一次扫到的左边界的下面第二行的坐标开始往上扫直到空白上方的左边界的行坐标值
+                ytemp = TFSite; ytemp >= FTSite; ytemp--)               //閿熸帴纰夋嫹涓€閿熸枻鎷锋壂閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰憮閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯瘷閿熸枻鎷锋閿熸枻鎷烽敓鏂ゆ嫹鏄曨€╃》鎷烽敓鏂ゆ嫹閿熺即銊栨唻鎷烽敓鏂ゆ嫹鐬婚敓鏂ゆ嫹鎴忛敓鏂ゆ嫹閿熸枻鎷烽敓绔枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻锟�
             {
               ImageDeal[ytemp].LeftBorder =
                   (int)(DetL * ((float)(ytemp - TFSite))) +
                   ImageDeal[TFSite]
-                      .LeftBorder;                                      //将这期间的空白处补线（补斜线），目的是方便图像处理
+                      .LeftBorder;                                      //閿熸枻鎷烽敓鏂ゆ嫹閿熻妭纭锋嫹鐩灮鐘堕敓鏂ゆ嫹閿熸枻鎷锋捀閿熸枻鎷烽敓鍙唻鎷锋捀閿熸枻鎷烽敓渚ュ尅鎷烽敓鏂ゆ嫹娆犻敓鏂ゆ嫹閿熼叺纭锋嫹閿熸枻鎷烽敓锟�
             }
         } else
-          TFSite = Ysite + 2;                                           //如果扫到了本行的左边界，该行存在这里面，（算斜率）
+          TFSite = Ysite + 2;                                           //閿熸枻鎷烽敓缂搭煉鎷烽敓鏂ゆ嫹鍚敓鏂ゆ嫹姊伴敓鏂ゆ嫹閿熺鐣岋紝閿熸枻鎷烽敓鍙揪鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻姤锛岄敓鏂ゆ嫹閿熸枻鎷锋枩閿熺粸锝忔嫹
       }
 
     if (ImageStatus.WhiteLine >= ImageStatus.TowPoint_True - 15)
@@ -966,18 +943,18 @@ static void DrawExtensionLine(void)        //绘制延长线并重新确定中�
       TFSite = 55;
     if (ExtenRFlag != 'F')
       for (Ysite = 54; Ysite >= (ImageStatus.OFFLine + 4);
-           Ysite--)               //从第五行开始网上扫扫到顶边下面两行
+           Ysite--)               //閿熸帴纰夋嫹閿熸枻鎷烽敓鍙尅鎷峰閿熸枻鎷烽敓鏂ゆ嫹鎵壂閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
       {
-        PicTemp = Pixle[Ysite];  //存当前行
+        PicTemp = Pixle[Ysite];  //閿熻姤褰撳墠閿熸枻鎷�
 
-        if (ImageDeal[Ysite].IsRightFind =='W')                       //如果本行右边界没扫到但扫到的是白色，说明本行没有右边界点，但是处于赛道内的
+        if (ImageDeal[Ysite].IsRightFind =='W')                       //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鍐跺憮閿熺煫绨ь煉鎷烽敓鏂ゆ嫹閿熺即顭掓嫹閿熸枻鎷烽敓鏂ゆ嫹鍓嶉敓缂搭偓鎷烽敓鍓跨鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鐭紮鎷烽敓鏂ゆ嫹鍐跺憮閿熷锛岄敓鏂ゆ嫹閿熻杈炬嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鑺傜鎷�
         {
-          if (ImageDeal[Ysite + 1].RightBorder <= 10)                 //如果右边界实在是太左边
+          if (ImageDeal[Ysite + 1].RightBorder <= 10)                 //閿熸枻鎷烽敓鏂ゆ嫹鍐跺憮閿熺粸纰夋嫹閿熸枻鎷烽敓鏁欘偓鎷烽敓鏂ゆ嫹
           {
-            ImageStatus.OFFLine =Ysite + 1;                           //直接跳出，说明这种情况赛道就尼玛离谱
+            ImageStatus.OFFLine =Ysite + 1;                           //鐩撮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
             break;
           }
-          while (Ysite >= (ImageStatus.OFFLine + 4))                  //此时还没扫到顶边下面两行
+          while (Ysite >= (ImageStatus.OFFLine + 4))                  //閿熸枻鎷锋椂閿熸枻鎷锋病鎵敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
           {
             Ysite--;
             if (  ImageDeal[Ysite].IsRightFind == 'T'
@@ -985,37 +962,37 @@ static void DrawExtensionLine(void)        //绘制延长线并重新确定中�
                 &&ImageDeal[Ysite - 2].IsRightFind == 'T'
                 &&ImageDeal[Ysite - 2].RightBorder < 70
                 &&ImageDeal[Ysite - 2].RightBorder > 10
-                )                                                      //如果扫到本行出现了并且本行以上连续三行都有左边界点（左边界在空白上方）
+                )                                                      //閿熸枻鎷烽敓缂搭煉鎷烽敓鏂ゆ嫹閿熸枻鎷疯皭閿熸枻鎷烽敓鏂ゆ嫹鐬敓鏂ゆ嫹鍐堕敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鍗搁敓鏂ゆ嫹閿熸枻鎷烽敓绔枻鎷锋倴顭掓嫹閿熺鏂ゆ嫹閿熻妭绌哄府鎷烽敓杈冨嚖鎷烽敓鏂ゆ嫹
             {
-              FTSite = Ysite - 2;                                      // 把本行上面的第二行存入FTsite
+              FTSite = Ysite - 2;                                      // 閿熺獤鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷风墶璇欓敓鏂ゆ嫹鍐欓敓鏂ゆ嫹閿熺唇Tsite
               break;
             }
           }
 
-          DetR =((float)(ImageDeal[FTSite].RightBorder -ImageDeal[TFSite].RightBorder)) /((float)(FTSite - TFSite));         //右边界的斜率：列的坐标差/行的坐标差
+          DetR =((float)(ImageDeal[FTSite].RightBorder -ImageDeal[TFSite].RightBorder)) /((float)(FTSite - TFSite));         //閿熸彮杈规枻鎷烽敓鍙唻鎷峰墿閿熸枻鎷锋閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�/閿熷彨纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
           if (FTSite > ImageStatus.OFFLine)
-            for (ytemp = TFSite; ytemp >= FTSite;ytemp--)              //从第一次扫到的右边界的下面第二行的坐标开始往上扫直到空白上方的右边界的行坐标值
+            for (ytemp = TFSite; ytemp >= FTSite;ytemp--)              //閿熸帴纰夋嫹涓€閿熸枻鎷锋壂閿熸枻鎷烽敓鏂ゆ嫹閿熸彮杈规枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鑺傝鎷烽敓鍙鎷烽敓鏂ゆ嫹閿熺枼寮€濮嬮敓鏂ゆ嫹閿熸枻鎷锋壂鐩撮敓鏂ゆ嫹閿熺Ц甯嫹閿熻緝鍑ゆ嫹閿熸枻鎷烽敓鎻竟鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓琛楋拷
             {
-              ImageDeal[ytemp].RightBorder =(int)(DetR * ((float)(ytemp - TFSite))) +ImageDeal[TFSite].RightBorder;          //将这期间的空白处补线（补斜线），目的是方便图像处理
+              ImageDeal[ytemp].RightBorder =(int)(DetR * ((float)(ytemp - TFSite))) +ImageDeal[TFSite].RightBorder;          //閿熸枻鎷烽敓鏂ゆ嫹閿熻妭纭锋嫹鐩灮鐘堕敓鏂ゆ嫹閿熸枻鎷锋捀閿熸枻鎷烽敓鍙唻鎷锋捀閿熸枻鎷烽敓渚ュ尅鎷烽敓鏂ゆ嫹娆犻敓鏂ゆ嫹閿熼叺纭锋嫹閿熸枻鎷烽敓锟�
             }
         } else
-          TFSite =Ysite +2;                                           //如果本行的右边界找到了，则把该行下面第二行坐标送个TFsite
+          TFSite =Ysite +2;                                           //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋閿熸枻鎷峰喍鍛撻敓鏂ゆ嫹涓氶敓鏂ゆ嫹鑰嶉敓鏂ゆ嫹閿熺獤闈╂嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯瘷閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閫忛敓绲婩site
       }
   }
   for (Ysite = 59; Ysite >= ImageStatus.OFFLine; Ysite--) {
-    ImageDeal[Ysite].Center =(ImageDeal[Ysite].LeftBorder + ImageDeal[Ysite].RightBorder) /2;                                //扫描结束，把这一块经优化之后的中间值存入
-    ImageDeal[Ysite].Wide =-ImageDeal[Ysite].LeftBorder +ImageDeal[Ysite].RightBorder;                                       //把优化之后的宽度存入
+    ImageDeal[Ysite].Center =(ImageDeal[Ysite].LeftBorder + ImageDeal[Ysite].RightBorder) /2;                                //鎵敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸彮浼欐嫹姒叏鎷峰憰閿熻顕嗘嫹閿熸枻鎷烽敓鍙》鎷峰€奸敓鏂ゆ嫹閿熸枻鎷�
+    ImageDeal[Ysite].Wide =-ImageDeal[Ysite].LeftBorder +ImageDeal[Ysite].RightBorder;                                       //閿熸枻鎷烽敓鑴氫紮鎷蜂箣閿熸枻鎷风洰閿熸枻鎷峰嵈閿熸枻鎷烽敓锟�
   }
 }
-/*上交大左右手法则扫线，作为处理圆环等判断元素的第二依据*/
+/*閿熻緝鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓琛楀嚖鎷烽敓鏂ゆ嫹鎵敓绔綇鎷烽敓鏂ゆ嫹涓洪敓鏂ゆ嫹閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿熷彨璁规嫹鍏冮敓鎴殑绗鎷烽敓鏂ゆ嫹閿熸枻鎷�*/
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 //  @name           Search_Bottom_Line_OTSU
-//  @brief          获取底层左右边线
-//  @param          imageInput[IMAGE_ROW][IMAGE_COL]        传入的图像数组
-//  @param          Row                                     图像的Ysite
-//  @param          Col                                     图像的Xsite
-//  @return         Bottonline                              底边行选择
-//  @time           2022年10月9日
+//  @brief          閿熸枻鎷峰彇閿熼樁璇ф嫹閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹
+//  @param          imageInput[IMAGE_ROW][IMAGE_COL]        閿熸枻鎷烽敓鏂ゆ嫹閿熼叺纭锋嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+//  @param          Row                                     鍥鹃敓鏂ゆ嫹閿熺祼site
+//  @param          Col                                     鍥鹃敓鏂ゆ嫹閿熺祻site
+//  @return         Bottonline                              閿熼樁鎲嬫嫹閿熸枻鎷烽€夐敓鏂ゆ嫹
+//  @time           2022閿熸枻鎷�10閿熸枻鎷�9閿熸枻鎷�
 //  @Author
 //  Sample usage:   Search_Bottom_Line_OTSU(imageInput, Row, Col, Bottonline);
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1023,12 +1000,12 @@ static void DrawExtensionLine(void)        //绘制延长线并重新确定中�
 void Search_Bottom_Line_OTSU(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 Col, uint8 Bottonline)
 {
 
-    //寻找左边边界
+    //瀵婚敓鏂ゆ嫹閿熸枻鎷峰紤鍛撻敓锟�
     for (int Xsite = Col / 2-2; Xsite > 1; Xsite--)
     {
         if (imageInput[Bottonline][Xsite] == 1 && imageInput[Bottonline][Xsite - 1] == 0)
         {
-            ImageDeal[Bottonline].LeftBoundary = Xsite;//获取底边左边线
+            ImageDeal[Bottonline].LeftBoundary = Xsite;//閿熸枻鎷峰彇閿熼樁鎲嬫嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
             break;
         }
     }
@@ -1036,7 +1013,7 @@ void Search_Bottom_Line_OTSU(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 Col,
     {
         if (imageInput[Bottonline][Xsite] == 1 && imageInput[Bottonline][Xsite + 1] == 0)
         {
-            ImageDeal[Bottonline].RightBoundary = Xsite;//获取底边右边线
+            ImageDeal[Bottonline].RightBoundary = Xsite;//閿熸枻鎷峰彇閿熼樁鎲嬫嫹閿熸彮鎲嬫嫹閿熸枻鎷�
             break;
         }
     }
@@ -1045,31 +1022,31 @@ void Search_Bottom_Line_OTSU(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 Col,
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 //  @name           Search_Left_and_Right_Lines
-//  @brief          通过sobel提取左右边线
-//  @param          imageInput[IMAGE_ROW][IMAGE_COL]        传入的图像数组
-//  @param          Row                                     图像的Ysite
-//  @param          Col                                     图像的Xsite
-//  @param          Bottonline                              底边行选择
-//  @return         无
-//  @time           2022年10月7日
+//  @brief          閫氶敓鏂ゆ嫹sobel閿熸枻鎷峰彇閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹
+//  @param          imageInput[IMAGE_ROW][IMAGE_COL]        閿熸枻鎷烽敓鏂ゆ嫹閿熼叺纭锋嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+//  @param          Row                                     鍥鹃敓鏂ゆ嫹閿熺祼site
+//  @param          Col                                     鍥鹃敓鏂ゆ嫹閿熺祻site
+//  @param          Bottonline                              閿熼樁鎲嬫嫹閿熸枻鎷烽€夐敓鏂ゆ嫹
+//  @return         閿熸枻鎷�
+//  @time           2022閿熸枻鎷�10閿熸枻鎷�7閿熸枻鎷�
 //  @Author
 //  Sample usage:   Search_Left_and_Right_Lines(imageInput, Row, Col, Bottonline);
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Search_Left_and_Right_Lines(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 Col, uint8 Bottonline)
 {
-    //定义小人的当前行走状态位置为 上 左 下 右 一次要求 上：左边为黑色 左：上边为褐色 下：右边为色  右：下面有黑色
-/*  前进方向定义：
+    //閿熸枻鎷烽敓鏂ゆ嫹灏忛敓鍓跨殑纰夋嫹鍓嶉敓鏂ゆ嫹閿熸枻鎷风姸鎬佷綅閿熸枻鎷蜂负 閿熸枻鎷� 閿熸枻鎷� 閿熸枻鎷� 閿熸枻鎷� 涓€閿熸枻鎷疯閿熸枻鎷� 閿熻緝锝忔嫹閿熸枻鎷烽敓杞款亷鎷烽敓缂达拷 閿熸枻鎷烽敓杈冩唻鎷蜂负閿熸枻鎷疯壊 閿熼摪锝忔嫹閿熸彮鎲嬫嫹涓鸿壊  閿熸彮锝忔嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷彨鐚存嫹鑹�
+/*  鍓嶉敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻棄锛�
                 *   0
                 * 3   1
                 *   2
 */
-/*寻左线坐标规则*/
+/*瀵婚敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷*/
     uint8 Left_Rule[2][8] = {
                                   {0,-1,1,0,0,1,-1,0 },//{0,-1},{1,0},{0,1},{-1,0},  (x,y )
                                   {-1,-1,1,-1,1,1,-1,1} //{-1,-1},{1,-1},{1,1},{-1,1}
     };
-    /*寻右线坐标规则*/
+    /*瀵婚敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷*/
     int Right_Rule[2][8] = {
                               {0,-1,1,0,0,1,-1,0 },//{0,-1},{1,0},{0,1},{-1,0},
                               {1,-1,1,1,-1,1,-1,-1} //{1,-1},{1,1},{-1,1},{-1,-1}
@@ -1077,13 +1054,13 @@ void Search_Left_and_Right_Lines(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 
       int num=0;
     uint8 Left_Ysite = Bottonline;
     uint8 Left_Xsite = ImageDeal[Bottonline].LeftBoundary;
-    uint8 Left_Rirection = 0;//左边方向
+    uint8 Left_Rirection = 0;//閿熸枻鎷峰徎閿熸枻鎷烽敓锟�
     uint8 Pixel_Left_Ysite = Bottonline;
     uint8 Pixel_Left_Xsite = 0;
 
     uint8 Right_Ysite = Bottonline;
     uint8 Right_Xsite = ImageDeal[Bottonline].RightBoundary;
-    uint8 Right_Rirection = 0;//右边方向
+    uint8 Right_Rirection = 0;//閿熸彮杈瑰嚖鎷烽敓鏂ゆ嫹
     uint8 Pixel_Right_Ysite = Bottonline;
     uint8 Pixel_Right_Xsite = 0;
     uint8 Ysite = Bottonline;
@@ -1108,30 +1085,30 @@ void Search_Left_and_Right_Lines(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 
                 Ysite--;
             }
         }
-        /*********左边巡线*******/
-        if ((Pixel_Left_Ysite > Ysite) || Ysite == ImageStatus.OFFLineBoundary)//右边扫线
+        /*********閿熸枻鎷烽敓绐栬鎷烽敓锟�*******/
+        if ((Pixel_Left_Ysite > Ysite) || Ysite == ImageStatus.OFFLineBoundary)//閿熸彮鎲嬫嫹鎵敓鏂ゆ嫹
         {
-            /*计算前方坐标*/
+            /*閿熸枻鎷烽敓鏂ゆ嫹鍓嶉敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹*/
             Pixel_Left_Ysite = Left_Ysite + Left_Rule[0][2 * Left_Rirection + 1];
             Pixel_Left_Xsite = Left_Xsite + Left_Rule[0][2 * Left_Rirection];
 
-            if (imageInput[Pixel_Left_Ysite][Pixel_Left_Xsite] == 0)//前方是黑色
+            if (imageInput[Pixel_Left_Ysite][Pixel_Left_Xsite] == 0)//鍓嶉敓鏂ゆ嫹閿熻鐚存嫹鑹�
             {
-                //顺时针旋转90
+                //椤烘椂閿熸枻鎷烽敓鏂ゆ嫹杞�90
                 if (Left_Rirection == 3)
                     Left_Rirection = 0;
                 else
                     Left_Rirection++;
             }
-            else//前方是白色
+            else//鍓嶉敓鏂ゆ嫹閿熻甯嫹鑹�
             {
-                /*计算左前方坐标*/
+                /*閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰墠閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�*/
                 Pixel_Left_Ysite = Left_Ysite + Left_Rule[1][2 * Left_Rirection + 1];
                 Pixel_Left_Xsite = Left_Xsite + Left_Rule[1][2 * Left_Rirection];
 
-                if (imageInput[Pixel_Left_Ysite][Pixel_Left_Xsite] == 0)//左前方为黑色
+                if (imageInput[Pixel_Left_Ysite][Pixel_Left_Xsite] == 0)//閿熸枻鎷峰墠閿熸枻鎷蜂负閿熸枻鎷疯壊
                 {
-                    //方向不变  Left_Rirection
+                    //閿熸枻鎷烽敓娲ヤ笉鎲嬫嫹  Left_Rirection
                     Left_Ysite = Left_Ysite + Left_Rule[0][2 * Left_Rirection + 1];
                     Left_Xsite = Left_Xsite + Left_Rule[0][2 * Left_Rirection];
                     if (ImageDeal[Left_Ysite].LeftBoundary_First == 0){
@@ -1139,9 +1116,9 @@ void Search_Left_and_Right_Lines(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 
                         ImageDeal[Left_Ysite].LeftBoundary = Left_Xsite;
                     }
                 }
-                else//左前方为白色
+                else//閿熸枻鎷峰墠閿熸枻鎷蜂负閿熸枻鎷疯壊
                 {
-                    // 方向发生改变 Left_Rirection  逆时针90度
+                    // 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓渚ユ唻鎷� Left_Rirection  閿熸枻鎷锋椂閿熸枻鎷�90閿熸枻鎷�
                     Left_Ysite = Left_Ysite + Left_Rule[1][2 * Left_Rirection + 1];
                     Left_Xsite = Left_Xsite + Left_Rule[1][2 * Left_Rirection];
                     if (ImageDeal[Left_Ysite].LeftBoundary_First == 0 )
@@ -1155,39 +1132,39 @@ void Search_Left_and_Right_Lines(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 
 
             }
         }
-        /*********右边巡线*******/
-        if ((Pixel_Right_Ysite > Ysite) || Ysite == ImageStatus.OFFLineBoundary)//右边扫线
+        /*********閿熸彮鎲嬫嫹宸￠敓鏂ゆ嫹*******/
+        if ((Pixel_Right_Ysite > Ysite) || Ysite == ImageStatus.OFFLineBoundary)//閿熸彮鎲嬫嫹鎵敓鏂ゆ嫹
         {
-            /*计算前方坐标*/
+            /*閿熸枻鎷烽敓鏂ゆ嫹鍓嶉敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹*/
             Pixel_Right_Ysite = Right_Ysite + Right_Rule[0][2 * Right_Rirection + 1];
             Pixel_Right_Xsite = Right_Xsite + Right_Rule[0][2 * Right_Rirection];
 
-            if (imageInput[Pixel_Right_Ysite][Pixel_Right_Xsite] == 0)//前方是黑色
+            if (imageInput[Pixel_Right_Ysite][Pixel_Right_Xsite] == 0)//鍓嶉敓鏂ゆ嫹閿熻鐚存嫹鑹�
             {
-                //逆时针旋转90
+                //閿熸枻鎷锋椂閿熸枻鎷烽敓鏂ゆ嫹杞�90
                 if (Right_Rirection == 0)
                     Right_Rirection = 3;
                 else
                     Right_Rirection--;
             }
-            else//前方是白色
+            else//鍓嶉敓鏂ゆ嫹閿熻甯嫹鑹�
             {
-                /*计算右前方坐标*/
+                /*閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰墠閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�*/
                 Pixel_Right_Ysite = Right_Ysite + Right_Rule[1][2 * Right_Rirection + 1];
                 Pixel_Right_Xsite = Right_Xsite + Right_Rule[1][2 * Right_Rirection];
 
-                if (imageInput[Pixel_Right_Ysite][Pixel_Right_Xsite] == 0)//左前方为黑色
+                if (imageInput[Pixel_Right_Ysite][Pixel_Right_Xsite] == 0)//閿熸枻鎷峰墠閿熸枻鎷蜂负閿熸枻鎷疯壊
                 {
-                    //方向不变  Right_Rirection
+                    //閿熸枻鎷烽敓娲ヤ笉鎲嬫嫹  Right_Rirection
                     Right_Ysite = Right_Ysite + Right_Rule[0][2 * Right_Rirection + 1];
                     Right_Xsite = Right_Xsite + Right_Rule[0][2 * Right_Rirection];
                     if (ImageDeal[Right_Ysite].RightBoundary_First == 79 )
                         ImageDeal[Right_Ysite].RightBoundary_First = Right_Xsite;
                     ImageDeal[Right_Ysite].RightBoundary = Right_Xsite;
                 }
-                else//左前方为白色
+                else//閿熸枻鎷峰墠閿熸枻鎷蜂负閿熸枻鎷疯壊
                 {
-                    // 方向发生改变 Right_Rirection  逆时针90度
+                    // 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓渚ユ唻鎷� Right_Rirection  閿熸枻鎷锋椂閿熸枻鎷�90閿熸枻鎷�
                     Right_Ysite = Right_Ysite + Right_Rule[1][2 * Right_Rirection + 1];
                     Right_Xsite = Right_Xsite + Right_Rule[1][2 * Right_Rirection];
                     if (ImageDeal[Right_Ysite].RightBoundary_First == 79)
@@ -1202,7 +1179,7 @@ void Search_Left_and_Right_Lines(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 
             }
         }
 
-        if (abs(Pixel_Right_Xsite - Pixel_Left_Xsite) < 3)//Ysite<80是为了放在底部是斑马线扫描结束  3 && Ysite < 30
+        if (abs(Pixel_Right_Xsite - Pixel_Left_Xsite) < 3)//Ysite<80閿熸枻鎷蜂负閿熷壙鍑ゆ嫹閿熻妭搴曡鎷烽敓瑙掑府鎷烽敓鏂ゆ嫹閿熸枻鎷锋壂閿熸枻鎷烽敓鏂ゆ嫹閿燂拷  3 && Ysite < 30
         {
 
             ImageStatus.OFFLineBoundary = Ysite;
@@ -1214,13 +1191,13 @@ void Search_Left_and_Right_Lines(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 //  @name           Search_Border_OTSU
-//  @brief          通过OTSU获取边线 和信息
-//  @param          imageInput[IMAGE_ROW][IMAGE_COL]        传入的图像数组
-//  @param          Row                                     图像的Ysite
-//  @param          Col                                     图像的Xsite
-//  @param          Bottonline                              底边行选择
-//  @return         无
-//  @time           2022年10月7日
+//  @brief          閫氶敓鏂ゆ嫹OTSU閿熸枻鎷峰彇閿熸枻鎷烽敓鏂ゆ嫹 閿熸枻鎷烽敓鏂ゆ嫹鎭�
+//  @param          imageInput[IMAGE_ROW][IMAGE_COL]        閿熸枻鎷烽敓鏂ゆ嫹閿熼叺纭锋嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+//  @param          Row                                     鍥鹃敓鏂ゆ嫹閿熺祼site
+//  @param          Col                                     鍥鹃敓鏂ゆ嫹閿熺祻site
+//  @param          Bottonline                              閿熼樁鎲嬫嫹閿熸枻鎷烽€夐敓鏂ゆ嫹
+//  @return         閿熸枻鎷�
+//  @time           2022閿熸枻鎷�10閿熸枻鎷�7閿熸枻鎷�
 //  @Author
 //  Sample usage:   Search_Border_OTSU(mt9v03x_image, IMAGE_ROW, IMAGE_COL, IMAGE_ROW-8);
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1230,13 +1207,13 @@ void Search_Border_OTSU(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 Col, uint
     ImageStatus.WhiteLine_L = 0;
     ImageStatus.WhiteLine_R = 0;
     //ImageStatus.OFFLine = 1;
-    /*封上下边界处理*/
+    /*閿熸枻鎷烽敓鏂ゆ嫹閿熼摪杈圭晫澶勯敓鏂ゆ嫹*/
     for (int Xsite = 0; Xsite < LCDW; Xsite++)
     {
         imageInput[0][Xsite] = 0;
         imageInput[Bottonline + 1][Xsite] = 0;
     }
-    /*封左右边界处理*/
+    /*閿熸枻鎷烽敓鏂ゆ嫹閿熸彮杈圭晫澶勯敓鏂ゆ嫹*/
     for (int Ysite = 0; Ysite < LCDH; Ysite++)
     {
             ImageDeal[Ysite].LeftBoundary_First = 0;
@@ -1245,9 +1222,9 @@ void Search_Border_OTSU(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 Col, uint
             imageInput[Ysite][0] = 0;
             imageInput[Ysite][LCDW - 1] = 0;
     }
-    /********获取底部边线*********/
+    /********閿熸枻鎷峰彇閿熼樁璇ф嫹閿熸枻鎷烽敓鏂ゆ嫹*********/
     Search_Bottom_Line_OTSU(imageInput, Row, Col, Bottonline);
-    /********获取左右边线*********/
+    /********閿熸枻鎷峰彇閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹*********/
     Search_Left_and_Right_Lines(imageInput, Row, Col, Bottonline);
 
 
@@ -1265,49 +1242,47 @@ void Search_Border_OTSU(uint8 imageInput[LCDH][LCDW], uint8 Row, uint8 Col, uint
     }
 }
 
-//出现丢边的时候  重新确定无边行的中线
+//閿熸枻鎷烽敓琛楄鎷烽敓绔鎷锋椂閿熸枻鎷�  閿熸枻鎷烽敓鏂ゆ嫹纭敓鏂ゆ嫹閿熺潾鎲嬫嫹閿熷彨纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹
 static void RouteFilter(void) {
 //  if(ImageStatus.Road_type != RightCirque && ImageStatus.Road_type != LeftCirque)
 //  {
-  for (Ysite = 58; Ysite >= (ImageStatus.OFFLine + 5);   //原本58
-       Ysite--)                                     //从开始位到停止位
+  for (Ysite = 58; Ysite >= (ImageStatus.OFFLine + 5);   //鍘熼敓鏂ゆ嫹58
+       Ysite--)                                     //閿熸帴鍖℃嫹濮嬩綅閿熸枻鎷峰仠姝綅
   {
     if (   ImageDeal[Ysite].IsLeftFind == 'W'
          &&ImageDeal[Ysite].IsRightFind == 'W'
          &&Ysite <= 45
          &&ImageDeal[Ysite - 1].IsLeftFind == 'W'
-         &&ImageDeal[Ysite - 1].IsRightFind =='W')  //当前行左右都无边，而且在前45行   滤波
+         &&ImageDeal[Ysite - 1].IsRightFind =='W')  //閿熸枻鎷峰墠閿熸枻鎷烽敓鏂ゆ嫹閿熸彮璁规嫹閿熺潾杈癸綇鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鍓�45閿熸枻鎷�   閿熷壙璇ф嫹
     {
       ytemp = Ysite;
-      while (ytemp >= (ImageStatus.OFFLine +5))     // 改改试试，-6效果好一些   原本+5
+      while (ytemp >= (ImageStatus.OFFLine +5))     // 閿熶茎闈╂嫹閿熸枻鎷烽敓鐨嗭綇鎷�-6鏁堥敓鏂ゆ嫹閿熸枻鎷蜂竴浜�   鍘熼敓鏂ゆ嫹+5
       {
         ytemp--;
         if (  ImageDeal[ytemp].IsLeftFind == 'T'
-            &&ImageDeal[ytemp].IsRightFind == 'T')  //寻找两边都正常的，找到离本行最近的就不找了
+            &&ImageDeal[ytemp].IsRightFind == 'T')  //瀵婚敓鏂ゆ嫹閿熸枻鎷烽敓绔鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓渚ワ綇鎷烽敓鎻鎷烽敓璇湰閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋湪绛掗敓鏂ゆ嫹閿熸枻鎷烽敓锟�
         {
-          DetR = (float)(ImageDeal[ytemp - 1].Center - ImageDeal[Ysite + 2].Center) /(float)(ytemp - 1 - Ysite - 2);          //算斜率
+          DetR = (float)(ImageDeal[ytemp - 1].Center - ImageDeal[Ysite + 2].Center) /(float)(ytemp - 1 - Ysite - 2);          //閿熸枻鎷锋枩閿熸枻鎷�
           int CenterTemp = ImageDeal[Ysite + 2].Center;
           int LineTemp = Ysite + 2;
           while (Ysite >= ytemp) {
-            ImageDeal[Ysite].Center =(int)(CenterTemp +DetR * (float)(Ysite - LineTemp));                                     //用斜率补
+            ImageDeal[Ysite].Center =(int)(CenterTemp +DetR * (float)(Ysite - LineTemp));                                     //閿熸枻鎷锋枩閿熺粸璇ф嫹
             Ysite--;
           }
           break;
         }
       }
     }
-    ImageDeal[Ysite].Center =(ImageDeal[Ysite - 1].Center + 2 * ImageDeal[Ysite].Center) /3;                                  //求平均，应该会比较滑  本来是上下两点平均
+    ImageDeal[Ysite].Center =(ImageDeal[Ysite - 1].Center + 2 * ImageDeal[Ysite].Center) /3;                                  //閿熸枻鎷峰钩閿熸枻鎷烽敓鏂ゆ嫹搴旈敓鐭紮鎷峰唹鍖ｉ敓锟�  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰钩閿熸枻鎷�
   }
 //  }
 }
 
-int icm_start_test_cross = 0;  //开启icm积分标志位
+int icm_start_test_cross = 0;  //閿熸枻鎷烽敓鏂ゆ嫹icm閿熸枻鎷烽敓琛楁唻鎷峰織浣�
 
-/****十字检测*****/  //上面的算法已经滤除了十字  相当于不要处理
+/****鍗侀敓琛楃》鎷烽敓锟�*****/  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋兇顭掓嫹涓敓鏂ゆ嫹椤洪敓鏂ゆ嫹閿熺粸顕嗘嫹閿燂拷  閿熸磥褰撻敓鑺傝鎷疯閿熸枻鎷烽敓鏂ゆ嫹
 void Cross_Test() {
-  /* 160×120: OFFLine阈值由15→30（等比于行数×2），
-   * OFFLine>30表示可视距离很近，开启陀螺仪积分辅助处理270°弯后十字 */
-  if (ImageStatus.OFFLine > 30)
+  if (ImageStatus.OFFLine > 15)                       //閿熸枻鎷烽敓鏂ゆ嫹閿熸帴鎾呮嫹閿熸枻鎷峰唹杈栭敓鏂ゆ嫹閿熺粸鎲嬫嫹閿燂拷 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓琛楄揪鎷烽敓鏂ゆ嫹  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓瑙ｅ閿熸枻鎷�270閿熸枻鎷烽敓鏂ゆ嫹閿熻顕嗘嫹閿熸枻鎷峰崄閿熸枻鎷�
     icm_start_test_cross = 1;
   else
     icm_start_test_cross = 0;
@@ -1318,7 +1293,7 @@ void Cross_Test() {
 //    ImageStatus.Road_type = 0;
 }
 
-//获取单行黑点数量  最后没有用到
+//閿熸枻鎷峰彇閿熸枻鎷烽敓鍙粦纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹  閿熸枻鎷烽敓鐭紮鎷烽敓鏂ゆ嫹鐜敓锟�
 int Black_Point = 0;
 int Black_Point_ALL = 0;
 void GetBlack_Point()
@@ -1338,7 +1313,7 @@ void GetBlack_Point()
 }
 
 
- //找最近边   最后没有用到
+ //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�   閿熸枻鎷烽敓鐭紮鎷烽敓鏂ゆ嫹鐜敓锟�
 void GetClose_Bord()
 {
   for (Ysite = 59; Ysite > 0; Ysite--) {
@@ -1360,7 +1335,7 @@ void GetClose_Bord()
         ImageDeal[Ysite].close_RightBorder = 79;
     }
 
-    //找反向近边
+    //閿熸彮鍑ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
     for (Xsite = ImageDeal[Ysite].close_LeftBorder + 1;
          Xsite < ImageStatus.MiddleLine; Xsite++) {
       if (*(PicTemp + Xsite) == 1 && (*(PicTemp + Xsite + 1) == 0) &&
@@ -1384,14 +1359,14 @@ void GetClose_Bord()
   }
 }
 
-/****圆环检测***/
+/****鍦嗛敓鏂ゆ嫹閿熸枻鎷烽敓锟�***/
 uint8 Pass_flag = 'F';
 //uint8 Left_Less_Num = 0;
-//环岛检测
+//閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 int ceshi_flag;
 //--------------------------------------------------------------
 //  @name           Element_Judgment_Left_Rings()
-//  @brief          整个图像判断的子函数，用来判断左圆环类型.
+//  @brief          閿熸枻鎷烽敓鏂ゆ嫹鍥鹃敓鏂ゆ嫹閿熷彨鏂鎷烽敓鎺ョ尨鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鍙鎷烽敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹.
 //  @parameter      void
 //  @time
 //  @Author         MRCHEN
@@ -1461,7 +1436,7 @@ void Element_Judgment_Left_Rings()
 
 //--------------------------------------------------------------
 //  @name           Element_Judgment_Right_Rings()
-//  @brief          整个图像判断的子函数，用来判断右圆环类型.
+//  @brief          閿熸枻鎷烽敓鏂ゆ嫹鍥鹃敓鏂ゆ嫹閿熷彨鏂鎷烽敓鎺ョ尨鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鍙鎷烽敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹.
 //  @parameter      void
 //  @time
 //  @Author         MRCHEN
@@ -1524,15 +1499,15 @@ void Element_Judgment_Right_Rings()
 
         ImageFlag.image_element_rings = 2;
         ImageFlag.image_element_rings_flag = 1;
-        ImageFlag.ring_big_small=1;     //小环
+        ImageFlag.ring_big_small=1;     //灏忛敓鏂ゆ嫹
         ImageStatus.Road_type = RightCirque;
     }
     Ring_Help_Flag = 0;
 }
-//左圆环处理
+//閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
 void Element_Handle_Left_Rings(void)
 {
-    /***************************************进程**************************************/
+    /***************************************閿熸枻鎷烽敓鏂ゆ嫹**************************************/
     int num = 0;
     for (int Ysite = 55; Ysite > 30; Ysite--)
     {
@@ -1542,7 +1517,7 @@ void Element_Handle_Left_Rings(void)
             && ImageDeal[Ysite+1].IsLeftFind == 'W' && ImageDeal[Ysite].IsLeftFind == 'T')
             break;
     }
-        //准备进环
+        //鍑嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
     if (ImageFlag.image_element_rings_flag == 1 && num>10)
     {
         ImageFlag.image_element_rings_flag = 2;
@@ -1551,17 +1526,17 @@ void Element_Handle_Left_Rings(void)
     {
         ImageFlag.image_element_rings_flag = 5;
     }
-        //进环
+        //閿熸枻鎷烽敓鏂ゆ嫹
     if(ImageFlag.image_element_rings_flag == 5 && /*num>15)*/ImageStatus.Right_Line>25)
     {
         ImageFlag.image_element_rings_flag = 6;
     }
-        //进环小圆环
+        //閿熸枻鎷烽敓鏂ゆ嫹灏忓渾閿熸枻鎷�
     if(ImageFlag.image_element_rings_flag == 6 && ImageStatus.Right_Line<3)
     {
         ImageFlag.image_element_rings_flag = 7;
     }
-        //环内 大圆环判断
+        //閿熸枻鎷烽敓鏂ゆ嫹 閿熸枻鎷峰渾閿熸枻鎷烽敓鍙鎷�
     if (ImageFlag.ring_big_small == 1 && ImageFlag.image_element_rings_flag == 7)
     {
         Point_Ysite = 0;
@@ -1586,19 +1561,19 @@ void Element_Handle_Left_Rings(void)
             ImageFlag.image_element_rings_flag = 8;
         }
     }
-    //出环后
+    //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
     if (ImageFlag.image_element_rings_flag == 8)
     {
         if (
                 //Straight_Judge(2, ImageStatus.OFFLine+15, 50) < 1
-                ImageStatus.Right_Line < 8     // 经过在华理轻工测试发现圆环出环跳变补直线过早，加强条件
+                ImageStatus.Right_Line < 8     // 閿熸枻鎷烽敓鏂ゆ嫹閿熻妭浼欐嫹閿熸枻鎷烽敓缁撳伐閿熸枻鎷烽敓鐨嗗嚖鎷烽敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鎴掕ˉ鐩撮敓绔櫢鎷烽敓鐣岋紝閿熸枻鎷峰己閿熸枻鎷烽敓鏂ゆ嫹
                 && ImageStatus.OFFLine < 13
-                )    //右边为直线且截止行（前瞻值）很小
+                )    //閿熸彮鎲嬫嫹涓虹洿閿熸枻鎷烽敓鎻枻鎷锋閿熷彨锝忔嫹鍓嶇灮鍊奸敓鏂ゆ嫹閿熸枻鎷峰皬
         {
             ImageFlag.image_element_rings_flag = 9;
         }
     }
-    //结束圆环进程
+    //閿熸枻鎷烽敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
     if (ImageFlag.image_element_rings_flag == 9)
     {
         int num=0;
@@ -1609,14 +1584,14 @@ void Element_Handle_Left_Rings(void)
         }
         if(num < 5)
         {
-            ImageStatus.Road_type = 0;   //出环处理完道路类型清0
+            ImageStatus.Road_type = 0;   //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓閾板嚖鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�0
             ImageFlag.image_element_rings_flag = 0;
             ImageFlag.image_element_rings = 0;
             ImageFlag.ring_big_small = 0;
         }
     }
-    /***************************************处理**************************************/
-        //准备进环  半宽处理
+    /***************************************閿熸枻鎷烽敓鏂ゆ嫹**************************************/
+        //鍑嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
     if (   ImageFlag.image_element_rings_flag == 1
         || ImageFlag.image_element_rings_flag == 2
         || ImageFlag.image_element_rings_flag == 3
@@ -1627,7 +1602,7 @@ void Element_Handle_Left_Rings(void)
             ImageDeal[Ysite].Center = ImageDeal[Ysite].RightBorder - Half_Road_Wide[Ysite]-5;
         }
     }
-        //进环  补线
+        //閿熸枻鎷烽敓鏂ゆ嫹  閿熸枻鎷烽敓鏂ゆ嫹
     if  ( ImageFlag.image_element_rings_flag == 5
         ||ImageFlag.image_element_rings_flag == 6
         )
@@ -1635,7 +1610,7 @@ void Element_Handle_Left_Rings(void)
         int  flag_Xsite_1=0;
         int flag_Ysite_1=0;
         float Slope_Rings=0;
-        for(Ysite=55;Ysite>ImageStatus.OFFLine;Ysite--)//下面弧点
+        for(Ysite=55;Ysite>ImageStatus.OFFLine;Ysite--)//閿熸枻鎷烽敓鑺ュ姬閿熸枻鎷�
         {
             for(Xsite=ImageDeal[Ysite].LeftBorder + 1;Xsite<ImageDeal[Ysite].RightBorder - 1;Xsite++)
             {
@@ -1669,7 +1644,7 @@ void Element_Handle_Left_Rings(void)
 
             }
         }
-        //补线
+        //閿熸枻鎷烽敓鏂ゆ嫹
         if(flag_Ysite_1 != 0)
         {
             for(Ysite=flag_Ysite_1;Ysite<60;Ysite++)
@@ -1680,7 +1655,7 @@ void Element_Handle_Left_Rings(void)
                     ImageDeal[Ysite].Center = 4;
             }
             ImageDeal[flag_Ysite_1].RightBorder=flag_Xsite_1;
-            for(Ysite=flag_Ysite_1-1;Ysite>10;Ysite--) //A点上方进行扫线
+            for(Ysite=flag_Ysite_1-1;Ysite>10;Ysite--) //A閿熸枻鎷烽敓杈冨嚖鎷烽敓鏂ゆ嫹閿熸枻鎷锋壂閿熸枻鎷�
             {
                 for(Xsite=ImageDeal[Ysite+1].RightBorder-10;Xsite<ImageDeal[Ysite+1].RightBorder+2;Xsite++)
                 {
@@ -1706,10 +1681,10 @@ void Element_Handle_Left_Rings(void)
             }
         }
     }
-    //环内不处理
+    //閿熸枻鎷烽敓鑺傝鎷烽敓鏂ゆ嫹閿熸枻鎷�
     if (ImageFlag.image_element_rings_flag == 7){}
-        //大圆环出环 补线
-    if (ImageFlag.image_element_rings_flag == 8 && ImageFlag.ring_big_small == 1)    //大圆环
+        //閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷� 閿熸枻鎷烽敓鏂ゆ嫹
+    if (ImageFlag.image_element_rings_flag == 8 && ImageFlag.ring_big_small == 1)    //閿熸枻鎷峰渾閿熸枻鎷�
     {
         Repair_Point_Xsite = 20;
         Repair_Point_Ysite = 5;
@@ -1719,11 +1694,11 @@ void Element_Handle_Left_Rings(void)
             {
                 Repair_Point_Xsite =23;
                 Repair_Point_Ysite= Ysite-1;
-                ImageStatus.OFFLine = Ysite + 1;  //截止行重新规划
+                ImageStatus.OFFLine = Ysite + 1;  //閿熸枻鎷锋閿熸枻鎷烽敓鏂ゆ嫹閿熼摪瑙勫垝
                 break;
             }
         }
-        for (int Ysite = 57; Ysite > Repair_Point_Ysite-3; Ysite--)//补线
+        for (int Ysite = 57; Ysite > Repair_Point_Ysite-3; Ysite--)//閿熸枻鎷烽敓鏂ゆ嫹
         {
             ImageDeal[Ysite].RightBorder = (ImageDeal[58].RightBorder - Repair_Point_Xsite) * (Ysite - 58) / (58 - Repair_Point_Ysite)  + ImageDeal[58].RightBorder;
            // ImageDeal[Ysite].RightBorder = ImageDeal[Ysite].LeftBorder + Half_Bend_Wide[Ysite];
@@ -1731,7 +1706,7 @@ void Element_Handle_Left_Rings(void)
             ImageDeal[Ysite].Center = ((ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) / 2);
         }
     }
-        //已出环 半宽处理
+        //閿熺獤绛规嫹閿熸枻鎷� 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
     if (ImageFlag.image_element_rings_flag == 9 || ImageFlag.image_element_rings_flag == 10)
     {
         for (int Ysite = 59; Ysite > ImageStatus.OFFLine; Ysite--)
@@ -1742,7 +1717,7 @@ void Element_Handle_Left_Rings(void)
 }
 //--------------------------------------------------------------
 //  @name           Element_Handle_Right_Rings()
-//  @brief          整个图像处理的子函数，用来处理右圆环类型.
+//  @brief          閿熸枻鎷烽敓鏂ゆ嫹鍥鹃敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸帴鐚存嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�.
 //  @parameter      void
 //  @time
 //  @Author         MRCHEN
@@ -1750,7 +1725,7 @@ void Element_Handle_Left_Rings(void)
 //-------------------------------------------------------------
 void Element_Handle_Right_Rings()
 {
-    /****************进程*****************/
+    /****************閿熸枻鎷烽敓鏂ゆ嫹*****************/
     int num =0 ;
     for (int Ysite = 55; Ysite > 30; Ysite--)
     {
@@ -1762,7 +1737,7 @@ void Element_Handle_Right_Rings()
             && ImageDeal[Ysite+1].IsRightFind == 'W' && ImageDeal[Ysite].IsRightFind == 'T' )
             break;
     }
-        //准备进环
+        //鍑嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
     if (ImageFlag.image_element_rings_flag == 1 && num>10)
     {
         ImageFlag.image_element_rings_flag = 2;
@@ -1771,12 +1746,12 @@ void Element_Handle_Right_Rings()
     {
         ImageFlag.image_element_rings_flag = 5;
     }
-        //进环
+        //閿熸枻鎷烽敓鏂ゆ嫹
     if(ImageFlag.image_element_rings_flag == 5 && ImageStatus.Left_Line>8)
     {
         ImageFlag.image_element_rings_flag = 6;
     }
-        //进环小圆环
+        //閿熸枻鎷烽敓鏂ゆ嫹灏忓渾閿熸枻鎷�
     if(ImageFlag.image_element_rings_flag == 6 && ImageStatus.Left_Line<3)
     {
         ImageFlag.image_element_rings_flag = 7;
@@ -1813,8 +1788,8 @@ void Element_Handle_Right_Rings()
     if (ImageFlag.image_element_rings_flag == 8)
     {
          if (   //Straight_Judge(1, ImageStatus.OFFLine+10, 45) < 1
-             /*&&*/ ImageStatus.Left_Line < 10 //经过在华理轻工的赛道测试，发现圆环出环跳变状态过早，加强跳变条件的约束
-             && ImageStatus.OFFLine < 16)    //右边为直线且截止行（前瞻值）很小
+             /*&&*/ ImageStatus.Left_Line < 10 //閿熸枻鎷烽敓鏂ゆ嫹閿熻妭浼欐嫹閿熸枻鎷烽敓缁撳伐閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熺殕锝忔嫹閿熸枻鎷烽敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鐘舵€侀敓鏂ゆ嫹閿熺晫锛岄敓鏂ゆ嫹寮洪敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹绾﹂敓鏂ゆ嫹
+             && ImageStatus.OFFLine < 16)    //閿熸彮鎲嬫嫹涓虹洿閿熸枻鎷烽敓鎻枻鎷锋閿熷彨锝忔嫹鍓嶇灮鍊奸敓鏂ゆ嫹閿熸枻鎷峰皬
             {ImageFlag.image_element_rings_flag = 9;}
     }
     if(ImageFlag.image_element_rings_flag == 9 )
@@ -1829,14 +1804,14 @@ void Element_Handle_Right_Rings()
         }
         if(num < 5)
         {
-            ImageStatus.Road_type = 0;   //出环处理完道路类型清0
+            ImageStatus.Road_type = 0;   //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓閾板嚖鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�0
             ImageFlag.image_element_rings_flag = 0;
             ImageFlag.image_element_rings = 0;
             ImageFlag.ring_big_small = 0;
         }
     }
-    /***************************************处理**************************************/
-         //准备进环  半宽处理
+    /***************************************閿熸枻鎷烽敓鏂ゆ嫹**************************************/
+         //鍑嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
     if (   ImageFlag.image_element_rings_flag == 1
         || ImageFlag.image_element_rings_flag == 2
         || ImageFlag.image_element_rings_flag == 3
@@ -1847,7 +1822,7 @@ void Element_Handle_Right_Rings()
             ImageDeal[Ysite].Center = ImageDeal[Ysite].LeftBorder + Half_Road_Wide[Ysite];
         }
     }
-        //进环  补线
+        //閿熸枻鎷烽敓鏂ゆ嫹  閿熸枻鎷烽敓鏂ゆ嫹
     if (   ImageFlag.image_element_rings_flag == 5
         || ImageFlag.image_element_rings_flag == 6)
     {
@@ -1887,18 +1862,18 @@ void Element_Handle_Right_Rings()
          }
         }
         }
-        //补线
+        //閿熸枻鎷烽敓鏂ゆ嫹
         if(flag_Ysite_1!=0)
         {
             for(Ysite=flag_Ysite_1;Ysite<58;Ysite++)
             {
                 ImageDeal[Ysite].LeftBorder=flag_Xsite_1+Slope_Right_Rings*(Ysite-flag_Ysite_1);
-                ImageDeal[Ysite].Center=(ImageDeal[Ysite].LeftBorder+ImageDeal[Ysite].RightBorder)/2;//板块
+                ImageDeal[Ysite].Center=(ImageDeal[Ysite].LeftBorder+ImageDeal[Ysite].RightBorder)/2;//閿熸枻鎷烽敓锟�
                 if(ImageDeal[Ysite].Center>79)
                     ImageDeal[Ysite].Center=79;
             }
             ImageDeal[flag_Ysite_1].LeftBorder=flag_Xsite_1;
-            for(Ysite=flag_Ysite_1-1;Ysite>10;Ysite--) //A点上方进行扫线
+            for(Ysite=flag_Ysite_1-1;Ysite>10;Ysite--) //A閿熸枻鎷烽敓杈冨嚖鎷烽敓鏂ゆ嫹閿熸枻鎷锋壂閿熸枻鎷�
             {
                 for(Xsite=ImageDeal[Ysite+1].LeftBorder+8;Xsite>ImageDeal[Ysite+1].LeftBorder-4;Xsite--)
                 {
@@ -1906,7 +1881,7 @@ void Element_Handle_Right_Rings()
                     {
                      ImageDeal[Ysite].LeftBorder=Xsite;
                      ImageDeal[Ysite].Wide=ImageDeal[Ysite].RightBorder-ImageDeal[Ysite].LeftBorder;
-                     ImageDeal[Ysite].Center=(ImageDeal[Ysite].LeftBorder+ImageDeal[Ysite].RightBorder)/2;//板块
+                     ImageDeal[Ysite].Center=(ImageDeal[Ysite].LeftBorder+ImageDeal[Ysite].RightBorder)/2;//閿熸枻鎷烽敓锟�
                      if(ImageDeal[Ysite].Center>79)
                          ImageDeal[Ysite].Center=79;
                      if(ImageDeal[Ysite].Center<5)
@@ -1926,10 +1901,10 @@ void Element_Handle_Right_Rings()
             }
         }
     }
-        //环内不处理
+        //閿熸枻鎷烽敓鑺傝鎷烽敓鏂ゆ嫹閿熸枻鎷�
     if (ImageFlag.image_element_rings_flag == 7){}
-        //大圆环出环 补线
-    if (ImageFlag.image_element_rings_flag == 8)  //大圆环
+        //閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷� 閿熸枻鎷烽敓鏂ゆ嫹
+    if (ImageFlag.image_element_rings_flag == 8)  //閿熸枻鎷峰渾閿熸枻鎷�
     {
         Repair_Point_Xsite = 39;
         Repair_Point_Ysite = 7;
@@ -1939,11 +1914,11 @@ void Element_Handle_Right_Rings()
             {
                 Repair_Point_Xsite = 39;
                 Repair_Point_Ysite = Ysite-1;
-                ImageStatus.OFFLine = Ysite + 1;  //截止行重新规划
+                ImageStatus.OFFLine = Ysite + 1;  //閿熸枻鎷锋閿熸枻鎷烽敓鏂ゆ嫹閿熼摪瑙勫垝
                 break;
             }
         }
-        for (int Ysite = 57; Ysite > Repair_Point_Ysite-3; Ysite--)         //补线
+        for (int Ysite = 57; Ysite > Repair_Point_Ysite-3; Ysite--)         //閿熸枻鎷烽敓鏂ゆ嫹
         {
             ImageDeal[Ysite].LeftBorder = (ImageDeal[58].LeftBorder - Repair_Point_Xsite) * (Ysite - 58) / (58 - Repair_Point_Ysite)  + ImageDeal[58].LeftBorder;
             //ImageDeal[Ysite].LeftBorder = ImageDeal[Ysite].RightBorder -  Half_Bend_Wide[Ysite]-11;
@@ -1951,7 +1926,7 @@ void Element_Handle_Right_Rings()
             ImageDeal[Ysite].Center = (ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) / 2;
         }
     }
-    //已出环 半宽处理
+    //閿熺獤绛规嫹閿熸枻鎷� 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
     if (ImageFlag.image_element_rings_flag == 9)
     {
         for (int Ysite = 59; Ysite > ImageStatus.OFFLine; Ysite--)
@@ -1963,26 +1938,26 @@ void Element_Handle_Right_Rings()
 //uint8 Pass_flag = 'F';
 //int for_err = 0;
 //int L_T_R_W;
-//uint8 Circle_Off = 'F';  //关闭圆环的状态位  由有无边决定
-//uint8 Out_Flag = 0;      //是否找到出环角点
-//int circleoff_lenth;     //出环防误判距离
+//uint8 Circle_Off = 'F';  //閿熸埅鎲嬫嫹鍦嗛敓鏂ゆ嫹閿熸枻鎷风姸鎬佷綅  閿熸枻鎷烽敓鏂ゆ嫹閿熺潾杈规拝鎷烽敓鏂ゆ嫹
+//uint8 Out_Flag = 0;      //閿熻鍑ゆ嫹閿熸彮纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻纰夋嫹
+//int circleoff_lenth;     //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷彨鎾呮嫹閿熸枻鎷�
 //int circle_just_one=1;
 //
 //
-////环岛检测
+////閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 //void CircleTest() {
 // // if(adcsum>4200)
 //  if ( (adcsum >= 5000)/*||(adcleft>2000&&adcright<800)||(adcleft<800&&adcright>2000) */   //3800
 //      &&ImageStatus.CirqueOut != 'T'
 //      && ImageStatus.CirquePass != 'T'
-//      &&ImageStatus.CirqueOff !='T')                              //电磁大于某个阈值并且没有处于圆环中  那么检测到圆环
+//      &&ImageStatus.CirqueOff !='T')                              //閿熸枻鎷风朝閿熸枻鎷烽敓渚ョ鎷烽敓鏂ゆ嫹閿熻纰夋嫹閿熸枻鎷烽敓鐭紮鎷峰啓閿熸枻鎷烽敓鐨嗚鎷烽敓鏂ゆ嫹閿燂拷  閿熸枻鎷蜂箞閿熸枻鎷风嵕鐨嗚鎷烽敓锟�
 //  {
-//    ImageStatus.IsCinqueOutIn = 'T';                              //此标志位用于圆环补线
+//    ImageStatus.IsCinqueOutIn = 'T';                              //閿熷壙鎲嬫嫹蹇椾綅閿熸枻鎷烽敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
 //  }
 //
-//  if (ImageStatus.IsCinqueOutIn == 'T')                           //判断是左还是右
+//  if (ImageStatus.IsCinqueOutIn == 'T')                           //閿熷彨璁规嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
 //  {
-//    for (Ysite = 55; Ysite > (ImageStatus.OFFLine + 2); Ysite--)  //左圆环
+//    for (Ysite = 55; Ysite > (ImageStatus.OFFLine + 2); Ysite--)  //閿熸枻鎷峰渾閿熸枻鎷�
 //    {
 //      if ((ImageDeal[Ysite].LeftBorder + 8 < ImageDeal[Ysite - 2].LeftBorder)
 //         &&ImageStatus.Road_type != RightCirque) {
@@ -1991,52 +1966,52 @@ void Element_Handle_Right_Rings()
 //        break;
 //      }
 //      else if (( ImageDeal[Ysite].RightBorder - 8 >ImageDeal[Ysite - 2].RightBorder)
-//               &&ImageStatus.Road_type != LeftCirque)               //右圆环
+//               &&ImageStatus.Road_type != LeftCirque)               //閿熸枻鎷峰渾閿熸枻鎷�
 //      {
 //        ImageStatus.Road_type = RightCirque;
 //        Pass_flag = 'F';
 //        break;
 //      }
 //      Pass_flag ='T';
-//                                                                    // 已经识别到圆环圆环但是没有找到左右特征点说明这时候已经进入圆环了
-//                                                                    // 跳出就可以改标志位了
+//                                                                    // 閿熺獤鎾呮嫹璇嗛敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹娌￠敓鏂ゆ嫹閿熸彮纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熸枻鎷烽敓鏂ゆ嫹鏃堕敓鏂ゆ嫹閿熺獤鎾呮嫹閿熸枻鎷烽敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹閿熸枻鎷�
+//                                                                    // 閿熸枻鎷烽敓鏂ゆ嫹閿熼叺鍖℃嫹閿熺殕鏀规唻鎷峰織浣嶉敓鏂ゆ嫹
 //    }
 //
-//    if (Pass_flag == 'T')                                           //没有识别到左右特征点说明已经进环岛
+//    if (Pass_flag == 'T')                                           //娌￠敓鏂ゆ嫹璇嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熸枻鎷烽敓绐栨拝鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
 //    {
-//      if (ImageStatus.Cirque1lenth*OX > 140)                     // 环岛里面电磁信号低 说明已经进入圆环
-//                                                                    // 有点问题感觉入环到环中需要改进方案
+//      if (ImageStatus.Cirque1lenth*OX > 140)                     // 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鑴氬彿纰夋嫹 璇撮敓鏂ゆ嫹閿熺獤鎾呮嫹閿熸枻鎷烽敓鏂ゆ嫹鍦嗛敓鏂ゆ嫹
+//                                                                    // 閿熷彨纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹鑺敓鏂ゆ嫹鐗栧嚖鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸彮顏庢嫹鎱曢敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 //      {
-//        ImageStatus.CirquePass ='T';                                //此标志表示已经进入到圆环中  通过这个标志位取消入环补线
+//        ImageStatus.CirquePass ='T';                                //閿熷壙鎲嬫嫹蹇楅敓鏂ゆ嫹绀洪敓绐栨拝鎷烽敓鏂ゆ嫹閿熻鍒板渾閿熸枻鎷烽敓鏂ゆ嫹  閫氶敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻鐤氳潡鈽呮嫹閿熸枻鎷风墫鍑ゆ嫹閿熸枻鎷烽敓锟�
 //        ImageStatus.IsCinqueOutIn = 'F';
-//        Pass_flag = 'F';                                            //清除标志位
+//        Pass_flag = 'F';                                            //閿熸枻鎷烽敓鏂ゆ嫹閿熻鐤氾拷
 //      }
 //    }
 //  }
 //
-//  if (ImageStatus.CirquePass == 'T' &&ImageStatus.Pass_Lenth * OX > 50)    //已经进入环之后就要判断出环点 //g5.22
-//                                                                            //还没写 仪 这个有点不稳
+//  if (ImageStatus.CirquePass == 'T' &&ImageStatus.Pass_Lenth * OX > 50)    //閿熺獤鎾呮嫹閿熸枻鎷烽敓璇幆涔嬮敓鏂ゆ嫹閿熸彮顏庢嫹鍗搁摚閿熸枻鎷烽敓鏂ゆ嫹閿燂拷 //g5.22
+//                                                                            //閿熸枻鎷锋病鍐� 閿熸枻鎷� 閿熸枻鎷烽敓鏂ゆ嫹姊版偞浼欐嫹閿燂拷
 //  {
-//    if (ImageStatus.Road_type == RightCirque)                               //右圆环的情况
+//    if (ImageStatus.Road_type == RightCirque)                               //閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 //    {
-//      for (Ysite = 53; Ysite > (ImageStatus.OFFLine + SystemData.OutCicle_line);Ysite--)  //右圆环出环看到的是左边的角  识别这个角就行
-//                                                                                          //但是截至行数不能太前  上半部分的图像不是很稳
+//      for (Ysite = 53; Ysite > (ImageStatus.OFFLine + SystemData.OutCicle_line);Ysite--)  //閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹鍙╂厱閿燂拷  璇嗛敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹钄烽敓鏂ゆ嫹閿燂拷
+//                                                                                          //閿熸枻鎷烽敓瑙掓枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹澶墠  閿熻緝鍗婇儴閿熻纰夋嫹鍥鹃敓鏂ゆ嫹閿熻鐚存嫹閿熸枻鎷�
 //      {
-//        if (((  ImageDeal[Ysite].LeftBorder - ImageDeal[Ysite -10].LeftBorder >1)         //中间大上下小的特征
+//        if (((  ImageDeal[Ysite].LeftBorder - ImageDeal[Ysite -10].LeftBorder >1)         //閿熷彨纭锋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷彨鈽呮嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
 //             &&(ImageDeal[Ysite].LeftBorder - ImageDeal[Ysite +10].LeftBorder > 1))
 //             ||(ImageDeal[Ysite + 1].IsLeftFind == 'T'
 //              &&ImageDeal[Ysite].IsLeftFind == 'T'
 //              &&ImageDeal[Ysite - 1].IsLeftFind == 'W')) {
 //          ImageStatus.CirquePass = 'F';
 //          ImageStatus.IsCinqueOutIn = 'F';
-//          ImageStatus.CirqueOut = 'T';                                                    //识别到角点  此时状态变成出环状态
+//          ImageStatus.CirqueOut = 'T';                                                    //璇嗛敓閲戝埌瑙掔鎷�  閿熸枻鎷锋椂鐘舵€侀敓鏂ゆ嫹娌欓敓鏂ゆ嫹閿熼樁鍒猴拷
 //
 //          break;
 //        }
 //      }
 //    }
 //
-//    if (ImageStatus.Road_type == LeftCirque)                                              //g和上面同理  左圆环
+//    if (ImageStatus.Road_type == LeftCirque)                                              //g閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰悓閿熸枻鎷�  閿熸枻鎷峰渾閿熸枻鎷�
 //    {
 //      for (Ysite = 53; Ysite > (ImageStatus.OFFLine + SystemData.OutCicle_line);Ysite--)
 //      {
@@ -2055,29 +2030,29 @@ void Element_Handle_Right_Rings()
 //    }
 //  }
 //
-//  if (ImageStatus.CirqueOut == 'T')                       //在出环的状态  会有出环的补线处理  但也要判断什么时候停止补线
-//                                                          //没加陀螺仪  下面的逻辑不是很稳  因为图像有时候有点搞
+//  if (ImageStatus.CirqueOut == 'T')                       //閿熻妭绛规嫹閿熸枻鎷烽敓鏂ゆ嫹鐘舵€�  閿熸枻鎷烽敓鍙鎷烽敓鏂ゆ嫹閿熶茎璇ф嫹閿熺杈炬嫹閿熸枻鎷�  閿熸枻鎷蜂篃瑕侀敓鍙鎷蜂粈涔堟椂閿熸枻鎷峰仠姝㈤敓鏂ゆ嫹閿熸枻鎷�
+//                                                          //娌￠敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰憭閿熸枻鎷烽敓鏂ゆ嫹鍛涢敓鏂ゆ嫹閿燂拷  閿熸枻鎷蜂负鍥鹃敓鏂ゆ嫹閿熸枻鎷锋椂閿熸枻鎷烽敓鍙鎷烽敓锟�
 //  {
-//   if (ImageStatus.Cirque2lenth*OX>272 )          //   如果出环后停止补线的特征都齐了
-//                                                          // 那么就结束圆环  基本回到开机状态
+//   if (ImageStatus.Cirque2lenth*OX>272 )          //   閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熼叺锛剁櫢鎷烽敓鏂ゆ嫹鍙╅敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+//                                                          // 閿熸枻鎷蜂箞閿熼叺鏂ゆ嫹閿熸枻鎷峰渾閿熸枻鎷�  閿熸枻鎷烽敓鏂ゆ嫹閿熸埅纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹鐘舵€�
 // //      if((adcsum >= 2000)||(adcleft>2200&&adcright<700)||(adcleft<700&&adcright>2200))
 //    {
 //      ImageStatus.CirquePass = 'F';
 //      ImageStatus.IsCinqueOutIn = 'F';
 //      ImageStatus.CirqueOut = 'F';
-//      ImageStatus.CirqueOff = 'T';                        //此标志表示出环后需要过一段距离再判断入环  防止二次入环
+//      ImageStatus.CirqueOff = 'T';                        //閿熷壙鎲嬫嫹蹇楅敓鏂ゆ嫹绀洪敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熸枻鎷蜂竴閿熻娇鎾呮嫹閿熸枻鎷烽敓鏂ゆ嫹閿熷彨璁规嫹閿熻鐜�  閿熸枻鎷锋閿熸枻鎷烽敓鏂ゆ嫹閿熻鐜�
 //    }
 //  }
 //
 //  if (ImageStatus.CirqueOff == 'T'
-//      &&ImageStatus.Out_Lenth * OX >140)                 //在结束出环后的1-2m将所有标志位初始化，（防止二次进环//150
-//                                                          //距离消抖）将OFF标志清楚 回到最开机状态
+//      &&ImageStatus.Out_Lenth * OX >140)                 //閿熻妭鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷1-2m閿熸枻鎷烽敓鏂ゆ嫹閿熷彨鎲嬫嫹蹇椾綅閿熸枻鎷峰閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹姝㈤敓鏂ゆ嫹閿熻娇鏂ゆ嫹閿熸枻鎷�//150
+//                                                          //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹OFF閿熸枻鎷峰織閿熸枻鎷烽敓锟� 閿熸埅纰夋嫹閿熺瓔寮€閿熸枻鎷风姸鎬�
 //  {   ImageStatus.sanchaju = 1;
 //      ImageStatus.CirquePass = 'F';
 //      ImageStatus.IsCinqueOutIn = 'F';
 //      ImageStatus.CirqueOut = 'F';
 //      ImageStatus.CirqueOff = 'F';
-//      ImageStatus.Road_type = 0;  //回到原来的状态
+//      ImageStatus.Road_type = 0;  //閿熸埅纰夋嫹鍘熼敓鏂ゆ嫹閿熸枻鎷风姸鎬�
 //      circle_just_one=0;
 //      SystemData.clrcle_num++;
 //  }
@@ -2087,12 +2062,12 @@ void Element_Handle_Right_Rings()
 //int circle_r = 10;
 //float circlk_k = 1.02;
 //void Circle_Handle() {
-//    //入环补线
-//  if (ImageStatus.IsCinqueOutIn == 'T')                           //此时处于入环状态
+//    //閿熻鐜敓鏂ゆ嫹閿熸枻鎷�
+//  if (ImageStatus.IsCinqueOutIn == 'T')                           //閿熸枻鎷锋椂閿熸枻鎷烽敓鏂ゆ嫹閿熻鐜姸鎬�
 //  {
-//    //左圆环
+//    //閿熸枻鎷峰渾閿熸枻鎷�
 //    if (ImageStatus.Road_type == LeftCirque) {
-//      for (Ysite = 55; Ysite > ImageStatus.OFFLine + 2; Ysite--)  //找到补线点
+//      for (Ysite = 55; Ysite > ImageStatus.OFFLine + 2; Ysite--)  //閿熸彮纰夋嫹閿熸枻鎷烽敓绔鎷�
 //      {
 //        if (ImageDeal[Ysite].LeftBorder + 8 < ImageDeal[Ysite - 2].LeftBorder) {
 //          Yjump1 = Ysite;
@@ -2101,7 +2076,7 @@ void Element_Handle_Right_Rings()
 //        }
 //      }
 //
-//      if (Yjump1 > 0) {                                           //开始补线
+//      if (Yjump1 > 0) {                                           //閿熸枻鎷峰閿熸枻鎷烽敓鏂ゆ嫹
 //        for (Ysite = Yjump1; Ysite < 55; Ysite++) {
 //          int temp =ImageDeal[Yjump1].LeftBorder + circle_r * sqrt(Ysite - Yjump1);
 //          if (temp < ImageDeal[Ysite].RightBorder)
@@ -2121,9 +2096,9 @@ void Element_Handle_Right_Rings()
 //      }
 //    }
 //
-//    //右圆环
+//    //閿熸枻鎷峰渾閿熸枻鎷�
 //    if (ImageStatus.Road_type == RightCirque) {
-//      for (Ysite = 55; Ysite > ImageStatus.OFFLine + 2; Ysite--)  //找到补线点
+//      for (Ysite = 55; Ysite > ImageStatus.OFFLine + 2; Ysite--)  //閿熸彮纰夋嫹閿熸枻鎷烽敓绔鎷�
 //      {
 //        if (ImageDeal[Ysite].RightBorder - 8 >ImageDeal[Ysite - 2].RightBorder) {
 //            Yjump1 = Ysite;
@@ -2132,7 +2107,7 @@ void Element_Handle_Right_Rings()
 //        }
 //      }
 //
-//      if (Yjump1 > 0) {                                           //开始补线
+//      if (Yjump1 > 0) {                                           //閿熸枻鎷峰閿熸枻鎷烽敓鏂ゆ嫹
 //        for (Ysite = Yjump1; Ysite < 55; Ysite++) {
 //          int temp =ImageDeal[Yjump1].RightBorder - circle_r * sqrt(Ysite - Yjump1);
 //          if (temp > ImageDeal[Ysite].LeftBorder)
@@ -2155,20 +2130,20 @@ void Element_Handle_Right_Rings()
 //    }
 //  }
 //
-//  ////出环补线
+//  ////閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
 //
-//  if (ImageStatus.CirqueOut == 'T')  //此时处于出环状态
+//  if (ImageStatus.CirqueOut == 'T')  //閿熸枻鎷锋椂閿熸枻鎷烽敓鑺傜鎷烽敓鏂ゆ嫹鐘舵€�
 //  {
-//    //左圆环
+//    //閿熸枻鎷峰渾閿熸枻鎷�
 //    float Det_R;
 //    if (ImageStatus.Road_type == LeftCirque) {
-//      Det_R = circlk_k * 79 / (55 - ImageStatus.OFFLine);                         //计算补线斜率
+//      Det_R = circlk_k * 79 / (55 - ImageStatus.OFFLine);                         //閿熸枻鎷烽敓濮愯ˉ閿熸枻鎷锋枩閿熸枻鎷�
 //      for (Ysite = 55; Ysite > ImageStatus.OFFLine; Ysite--) {
 //        int temp = (int)(ImageDeal[55].RightBorder - Det_R * (55 - Ysite));
 //        if (temp < 0) {
 //          temp = 0;
 //        }
-//        if (temp < ImageDeal[Ysite].RightBorder) {                                //补线
+//        if (temp < ImageDeal[Ysite].RightBorder) {                                //閿熸枻鎷烽敓鏂ゆ嫹
 //          ImageDeal[Ysite].RightBorder = temp;
 //          ImageDeal[Ysite].LeftBorder = 0;
 //          ImageDeal[Ysite].Center =(ImageDeal[Ysite].LeftBorder + ImageDeal[Ysite].RightBorder) / 2;
@@ -2176,7 +2151,7 @@ void Element_Handle_Right_Rings()
 //        }
 //      }
 //    }
-////同上
+////鍚岄敓鏂ゆ嫹
 //    float Det_L;
 //    if (ImageStatus.Road_type == RightCirque) {
 //      Det_L = circlk_k * 79 / (55 - ImageStatus.OFFLine);
@@ -2198,117 +2173,117 @@ void Element_Handle_Right_Rings()
 //  }
 //}
 //
-//三岔口检测
-uint8 f1 = 0;  //没用
-uint8 f2 = 0;  //没用
-uint8 f3 = 0;  //没用
-uint8 Fork_in_1 = 0;//近端特征点
-uint8 Fork_in_2 = 0;//远端特征点
-uint8 Fork_in = 0;  //入三叉标志
-uint8 ForkLinePointx_l = 0;//三叉倒三角左边列
-uint8 ForkLinePointx_r = 0;//三叉倒三角右边列
-int ForkLinePointy = 0;    //三叉倒三角底边行
-int Fork1_Y = 0;           //三叉近端特征行
-int Fork2_Y = 0;           //三叉远端特征行
-int Fork_dowm = 0;         //三叉减速标志  编码器积分退出
+//閿熸枻鎷烽敓鏂ゆ嫹閿熻妭纭锋嫹閿燂拷
+uint8 f1 = 0;  //娌￠敓鏂ゆ嫹
+uint8 f2 = 0;  //娌￠敓鏂ゆ嫹
+uint8 f3 = 0;  //娌￠敓鏂ゆ嫹
+uint8 Fork_in_1 = 0;//閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+uint8 Fork_in_2 = 0;//杩滈敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+uint8 Fork_in = 0;  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓琛楋拷
+uint8 ForkLinePointx_l = 0;//閿熸枻鎷烽敓鑺ュ€掗敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
+uint8 ForkLinePointx_r = 0;//閿熸枻鎷烽敓鑺ュ€掗敓鏂ゆ嫹閿熸枻鎷烽敓鎻唻鎷烽敓鏂ゆ嫹
+int ForkLinePointy = 0;    //閿熸枻鎷烽敓鑺ュ€掗敓鏂ゆ嫹閿熻搴曟唻鎷烽敓鏂ゆ嫹
+int Fork1_Y = 0;           //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+int Fork2_Y = 0;           //閿熸枻鎷烽敓鏂ゆ嫹杩滈敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+int Fork_dowm = 0;         //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷蜂喀閿熻锟�  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鍓跨鎷�
 //void ForkTest() {
-//  int wide = 0;   //临时变量
-////  int Fork_thr;   //切换强弱判断的阈值
+//  int wide = 0;   //閿熸枻鎷锋椂閿熸枻鎷烽敓鏂ゆ嫹
+////  int Fork_thr;   //閿熷彨浼欐嫹寮洪敓鏂ゆ嫹閿熷彨鏂鎷烽敓鏂ゆ嫹鍊�
 ////  if (SystemData.Model < 2)
 ////    Fork_thr = 5000;
 ////  else
 ////    Fork_thr = 5000;
 ////     Fork_thr=5000;
-//  //找由直道变到岔道的第一特征
-// if (adcsum > 800)                 //在三叉口以外的
+//  //閿熸枻鎷烽敓鏂ゆ嫹鐩撮敓鏂ゆ嫹閿熸垝鍒伴敓鏂ゆ嫹閿熸枻鎷烽敓渚ョ鎷蜂竴閿熸枻鎷烽敓鏂ゆ嫹
+// if (adcsum > 800)                 //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
 //  {
-//    for (Ysite = 53; Ysite > (ImageStatus.OFFLine + 6);Ysite--)   //防止Ysite溢出
+//    for (Ysite = 53; Ysite > (ImageStatus.OFFLine + 6);Ysite--)   //閿熸枻鎷锋Ysite閿熸枻鎷烽敓锟�
 //
 //    {
 //      if ((  ImageDeal[Ysite].IsRightFind == 'T'
 //           &&ImageDeal[Ysite + 1].IsRightFind == 'T')
 //          ||(ImageDeal[Ysite].IsLeftFind == 'T'
-//           &&ImageDeal[Ysite + 1].IsLeftFind =='T'))            //进三叉的时候一般会看见左右两边120*的圆角
+//           &&ImageDeal[Ysite + 1].IsLeftFind =='T'))            //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓缁炴唻鎷烽敓鎻紮鎷烽敓缁撶湅閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�120*閿熸枻鎷峰渾閿熸枻鎷�
 //      {
 //        if (((ImageDeal[Ysite].LeftBorder - ImageDeal[Ysite - 6].LeftBorder) >2
 //             &&(ImageDeal[Ysite].LeftBorder - ImageDeal[Ysite - 6].LeftBorder) <8
 //            &&(ImageDeal[Ysite].LeftBorder - ImageDeal[Ysite + 6].LeftBorder) >2
-//             &&(ImageDeal[Ysite].LeftBorder - ImageDeal[Ysite + 6].LeftBorder) <8)        //左边的角
+//             &&(ImageDeal[Ysite].LeftBorder - ImageDeal[Ysite + 6].LeftBorder) <8)        //閿熸枻鎷峰彥鎱曢敓锟�
 //            ||((ImageDeal[Ysite - 6].RightBorder - ImageDeal[Ysite].RightBorder) >2
 //             &&(ImageDeal[Ysite - 6].RightBorder - ImageDeal[Ysite].RightBorder) <8
-//           // &&(ImageDeal[Ysite + 6].RightBorder - ImageDeal[Ysite].RightBorder) >2       //右边的角 看到一个就可以  因为看到两个经常漏判
+//           // &&(ImageDeal[Ysite + 6].RightBorder - ImageDeal[Ysite].RightBorder) >2       //閿熸彮杈圭殑鏂ゆ嫹 閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓閰靛尅鎷烽敓鏂ゆ嫹  閿熸枻鎷蜂负閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹婕忛敓鏂ゆ嫹
 //           //  &&(ImageDeal[Ysite + 6].RightBorder -ImageDeal[Ysite].RightBorder) < 8
-//             ))     //阈值需要调整
+//             ))     //閿熸枻鎷峰€奸敓鏂ゆ嫹瑕侀敓鏂ゆ嫹閿熸枻鎷�
 //        {
-//          Fork_in_1 = 'T';  //表示近端的角点特征找到
-//          Fork1_Y = Ysite;  //记录第一特征点的行数
+//          Fork_in_1 = 'T';  //閿熸枻鎷风ず閿熸枻鎷烽敓鍓跨殑瑙掔鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鎻鎷�
+//          Fork1_Y = Ysite;  //閿熸枻鎷峰綍閿熸枻鎷蜂竴閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 //          break;
 //        }
 //
 //        else {
-//          Fork_in_1 = 'F';  //没找到GG
+//          Fork_in_1 = 'F';  //娌￠敓鎻鎷稧G
 //        }
 //      }
 //    }
 //
-//    //第二特征  找黑色三角块  并运算得到相关图像信息
-//    for (Ysite = Fork1_Y; Ysite > (ImageStatus.OFFLine);Ysite--)                                          //从第一特征点开始往上搜索
+//    //閿熻妭璁规嫹閿熸枻鎷烽敓鏂ゆ嫹  閿熸彮鐚存嫹鑹查敓鏂ゆ嫹閿熻鍖℃嫹  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷风帿閿熸枻鎷烽敓鏂ゆ嫹鍥鹃敓鏂ゆ嫹閿熸枻鎷锋伅
+//    for (Ysite = Fork1_Y; Ysite > (ImageStatus.OFFLine);Ysite--)                                          //閿熸帴纰夋嫹涓€閿熸枻鎷烽敓鏂ゆ嫹閿熷寮€濮嬮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
 //    {
 //      PicTemp = Pixle[Ysite];
-//      for (Xsite = ImageDeal[Ysite].LeftBorder; Xsite < 50;Xsite++)                                       //找三叉口黑色三角块
+//      for (Xsite = ImageDeal[Ysite].LeftBorder; Xsite < 50;Xsite++)                                       //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熺即顐嫹閿熸枻鎷峰己閿燂拷
 //      {
-//        if ((*(PicTemp + Xsite) != 0) && (*(PicTemp + Xsite + 1) == 0) &&(*(PicTemp + Xsite + 2) == 0))   //找到黑色角快的左边
+//        if ((*(PicTemp + Xsite) != 0) && (*(PicTemp + Xsite + 1) == 0) &&(*(PicTemp + Xsite + 2) == 0))   //閿熸彮纰夋嫹閿熸枻鎷疯壊閿熻鍖℃嫹閿熸枻鎷烽敓鏂ゆ嫹
 //        {
-//          ImageDeal[Ysite].Black_Wide_L = Xsite + 1;                                                       //记录此时的左黑边界
+//          ImageDeal[Ysite].Black_Wide_L = Xsite + 1;                                                       //閿熸枻鎷峰綍閿熸枻鎷锋椂閿熸枻鎷烽敓鏂ゆ嫹璇掑憮閿燂拷
 //          break;
 //        } else
-//          ImageDeal[Ysite].Black_Wide_L =ImageDeal[Ysite].Center;                                          //没找到就在中点
+//          ImageDeal[Ysite].Black_Wide_L =ImageDeal[Ysite].Center;                                          //娌￠敓鎻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鍙鎷�
 //      }
 //
-//      for (Xsite = ImageDeal[Ysite].RightBorder; Xsite > 30;Xsite--)                                       //找三叉口黑色三角块
+//      for (Xsite = ImageDeal[Ysite].RightBorder; Xsite > 30;Xsite--)                                       //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熺即顐嫹閿熸枻鎷峰己閿燂拷
 //      {
 //        if (  (*(PicTemp + Xsite) == 0)
 //           && (*(PicTemp + Xsite - 1) == 0)
-//            &&(*(PicTemp + Xsite + 1) != 0))      //找到黑色角快的右边
+//            &&(*(PicTemp + Xsite + 1) != 0))      //閿熸彮纰夋嫹閿熸枻鎷疯壊閿熻鍖℃嫹閿熸枻鎷峰喍閿燂拷
 //        {
-//          ImageDeal[Ysite].Black_Wide_R = Xsite;  //记录此时的右黑边界
+//          ImageDeal[Ysite].Black_Wide_R = Xsite;  //閿熸枻鎷峰綍閿熸枻鎷锋椂閿熸枻鎷烽敓鎻粦杈规枻鎷�
 //          break;
 //        } else
-//          ImageDeal[Ysite].Black_Wide_R = ImageDeal[Ysite].Center;                                          //没找到就在中点
+//          ImageDeal[Ysite].Black_Wide_R = ImageDeal[Ysite].Center;                                          //娌￠敓鎻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鍙鎷�
 //      }
 //
 //      for (Xsite = ImageDeal[Ysite].Black_Wide_L;
 //           Xsite <= ImageDeal[Ysite].Black_Wide_R; Xsite++) {
 //        if (ImageDeal[Ysite].Black_Wide_L == ImageDeal[Ysite].Center
-//            ||ImageDeal[Ysite].Black_Wide_R ==ImageDeal[Ysite].Center)                                       //如果是中点值那么GG因为这是没找到
+//            ||ImageDeal[Ysite].Black_Wide_R ==ImageDeal[Ysite].Center)                                       //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋閿熻纰夋嫹閿熺煫纰怗閿熸枻鎷蜂负閿熸枻鎷烽敓鏂ゆ嫹娌￠敓鎻鎷�
 //          break;
-//        else if ((*(PicTemp + Xsite) == 0))     //数数左黑和右黑之间的黑点数
+//        else if ((*(PicTemp + Xsite) == 0))     //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熸枻鎷锋恫閿熻顕嗘嫹閿熶茎榛戠鎷烽敓鏂ゆ嫹
 //        {
-//          wide++;                               //计算找到三角块的本行黑点数
+//          wide++;                               //閿熸枻鎷烽敓鏂ゆ嫹閿熸彮纰夋嫹閿熸枻鎷烽敓瑙掑尅鎷疯皨閿熸枻鎷锋郴璇橀敓鏂ゆ嫹閿燂拷
 //        }
 //      }
 //
-//      ImageDeal[Ysite].BlackWide = wide;        //记录这个宽度
-//      ImageDeal[Ysite].Black_Pro =ImageDeal[Ysite].BlackWide / ImageDeal[Ysite].Wide;                         //图像黑点比例
-//      wide = 0;                                 //清0
+//      ImageDeal[Ysite].BlackWide = wide;        //閿熸枻鎷峰綍閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
+//      ImageDeal[Ysite].Black_Pro =ImageDeal[Ysite].BlackWide / ImageDeal[Ysite].Wide;                         //鍥鹃敓鏂ゆ嫹璇橀敓鏂ゆ嫹閿熸枻鎷�
+//      wide = 0;                                 //閿熸枻鎷�0
 //    }
 //
-//    //判断是否为三叉的黑色三角块
+//    //閿熷彨璁规嫹閿熻鍑ゆ嫹涓洪敓鏂ゆ嫹閿熸枻鎷锋毊閿熺即顐嫹閿熸枻鎷峰己閿燂拷
 //    for (Ysite = Fork1_Y; Ysite >= (ImageStatus.OFFLine + 1); Ysite--)  // g
 //    {
-//      if (( ImageDeal[Ysite].BlackWide - ImageDeal[Ysite + 3].BlackWide) >=2 //如果这个左黑和右黑之间黑点数比较多 并且满足三角形的形状
+//      if (( ImageDeal[Ysite].BlackWide - ImageDeal[Ysite + 3].BlackWide) >=2 //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹璇ら敓鏂ゆ嫹娑查敓琛楊噯鎷烽敓鑺傜鎷烽敓鏂ゆ嫹閿熼ズ杈冭鎷� 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻娇纰夋嫹閿熸枻鎷风姸
 //          &&ImageDeal[Ysite].BlackWide > 21
 //          &&ImageDeal[Ysite + 1].BlackWide > 17
 //          &&ImageDeal[Ysite - 1].BlackWide > 17
-//          &&(39 - ImageDeal[Ysite].Black_Wide_L) > 0                        //滤除斜十字
+//          &&(39 - ImageDeal[Ysite].Black_Wide_L) > 0                        //閿熷壙绛规嫹鏂滃崄閿熸枻鎷�
 //          &&(ImageDeal[Ysite].Black_Wide_R - 39) > 0) {
-//        ForkLinePointx_r = ImageDeal[Ysite].Black_Wide_R;                   //用于补线的点
+//        ForkLinePointx_r = ImageDeal[Ysite].Black_Wide_R;                   //閿熸枻鎷烽敓鑺傝鎷烽敓绔殑纰夋嫹
 //        ForkLinePointx_l = ImageDeal[Ysite].Black_Wide_L;
 //        ForkLinePointy = Ysite;
-//        Fork2_Y = Ysite;                                                    //记录第二特征点的行数
+//        Fork2_Y = Ysite;                                                    //閿熸枻鎷峰綍閿熻妭璁规嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 //        if (Fork1_Y - Fork2_Y > 6)
 //        {
-//          Fork_in_2 ='T';                                                   //当两特征点行数大于10   才判断为入环特征点  用于防误判
+//          Fork_in_2 ='T';                                                   //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�10   閿熸枻鎷烽敓鍙鎷蜂负閿熻鐜敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹  閿熸枻鎷烽敓鑺傚嚖鎷烽敓鏂ゆ嫹閿熸枻鎷�
 //          break;
 //        }
 //
@@ -2327,19 +2302,19 @@ int Fork_dowm = 0;         //三叉减速标志  编码器积分退出
 //      ImageStatus.Road_type = Forkin;
 //  }
 //
-////  已经进入三叉口   降低分辨阈值  更好地识别出岔口   就不用识别第一特征点
-////  只要识别第二特征点 同上
+////  閿熺獤鎾呮嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷   閿熸枻鎷烽敓閰靛垎鎲嬫嫹閿熸枻鎷峰€�  閿熸枻鎷烽敓鐭鎷疯瘑閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�   閿熼叺璇ф嫹閿熸枻鎷疯瘑閿熸枻鎷烽敓鎻紮鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�
+////  鍙璇嗛敓鏂ゆ嫹璇欓敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷 鍚岄敓鏂ゆ嫹
 // else if (adcsum < 800)
 //  {
-//    //第二特征  找黑色三角块  并运算得到相关图像信息
+//    //閿熻妭璁规嫹閿熸枻鎷烽敓鏂ゆ嫹  閿熸彮鐚存嫹鑹查敓鏂ゆ嫹閿熻鍖℃嫹  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷风帿閿熸枻鎷烽敓鏂ゆ嫹鍥鹃敓鏂ゆ嫹閿熸枻鎷锋伅
 //    for (Ysite = 55; Ysite > (ImageStatus.OFFLine); Ysite--)
 //    {
 //      PicTemp = Pixle[Ysite];
-//      for (Xsite = ImageDeal[Ysite].LeftBorder; Xsite < 55;Xsite++)  //找三叉口黑色三角块
+//      for (Xsite = ImageDeal[Ysite].LeftBorder; Xsite < 55;Xsite++)  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熺即顐嫹閿熸枻鎷峰己閿燂拷
 //      {
 //        if ((  *(PicTemp + Xsite) != 0)
 //            &&(*(PicTemp + Xsite + 1) == 0)
-//            &&(*(PicTemp + Xsite + 2) == 0))                          //找到黑色角快左边
+//            &&(*(PicTemp + Xsite + 2) == 0))                          //閿熸彮纰夋嫹閿熸枻鎷疯壊閿熻鍖℃嫹閿熸枻鎷烽敓锟�
 //        {
 //          ImageDeal[Ysite].Black_Wide_L = Xsite + 1;
 //          break;
@@ -2347,11 +2322,11 @@ int Fork_dowm = 0;         //三叉减速标志  编码器积分退出
 //          ImageDeal[Ysite].Black_Wide_L = ImageDeal[Ysite].Center;
 //      }
 //
-//      for (Xsite = ImageDeal[Ysite].RightBorder; Xsite > 25;Xsite--)  //找三叉口黑色三角块//g
+//      for (Xsite = ImageDeal[Ysite].RightBorder; Xsite > 25;Xsite--)  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷疯閿熺即顐嫹閿熸枻鎷峰己閿燂拷//g
 //      {
 //        if ((   *(PicTemp + Xsite) == 0)
 //             &&(*(PicTemp + Xsite - 1) == 0)
-//             &&(*(PicTemp + Xsite + 1) != 0))                         //找到黑色角快右边
+//             &&(*(PicTemp + Xsite + 1) != 0))                         //閿熸彮纰夋嫹閿熸枻鎷疯壊閿熻鍖℃嫹閿熸彮鎲嬫嫹
 //        {
 //          ImageDeal[Ysite].Black_Wide_R = Xsite;
 //          break;
@@ -2372,7 +2347,7 @@ int Fork_dowm = 0;         //三叉减速标志  编码器积分退出
 //      }
 //
 //      ImageDeal[Ysite].BlackWide = wide;
-//      ImageDeal[Ysite].Black_Pro =ImageDeal[Ysite].BlackWide / ImageDeal[Ysite].Wide;  //图像黑点比例
+//      ImageDeal[Ysite].Black_Pro =ImageDeal[Ysite].BlackWide / ImageDeal[Ysite].Wide;  //鍥鹃敓鏂ゆ嫹璇橀敓鏂ゆ嫹閿熸枻鎷�
 //      wide = 0;
 //      if (ImageDeal[Ysite].BlackWide > 2)
 //        ImageDeal[Ysite].isBlackFind = 'T';
@@ -2380,13 +2355,13 @@ int Fork_dowm = 0;         //三叉减速标志  编码器积分退出
 //        ImageDeal[Ysite].isBlackFind = 'F';
 //    }
 //
-//    //判断是否为三叉的黑色三角块
+//    //閿熷彨璁规嫹閿熻鍑ゆ嫹涓洪敓鏂ゆ嫹閿熸枻鎷锋毊閿熺即顐嫹閿熸枻鎷峰己閿燂拷
 //    for (Ysite = 55; Ysite >= (ImageStatus.OFFLine); Ysite--)  // g
 //    {
 //      if (( ImageDeal[Ysite].BlackWide - ImageDeal[Ysite + 3].BlackWide) > 1
 //          &&ImageDeal[Ysite].BlackWide > 16
 //          &&ImageDeal[Ysite + 1].BlackWide > 15
-//          && (39 - ImageDeal[Ysite].Black_Wide_L) > 0                                 //滤除斜十字
+//          && (39 - ImageDeal[Ysite].Black_Wide_L) > 0                                 //閿熷壙绛规嫹鏂滃崄閿熸枻鎷�
 //          && (ImageDeal[Ysite].Black_Wide_R - 39) > 0) {
 //        ForkLinePointx_r = ImageDeal[Ysite].Black_Wide_R;
 //        ForkLinePointx_l = ImageDeal[Ysite].Black_Wide_L;
@@ -2418,7 +2393,7 @@ int Fork_dowm = 0;         //三叉减速标志  编码器积分退出
 //  int yuansanshu;
 //  yuansanshu=SystemData.clrcle_num%2;
 //  if (  (ImageStatus.Road_type == Forkin || ImageStatus.Road_type == Forkout)
-//      &&(yuansanshu == 1))                                           //第一圈右补线
+//      &&(yuansanshu == 1))                                           //閿熸枻鎷蜂竴鍦堥敓鎻鎷烽敓鏂ゆ嫹
 //  {
 //    Det_Fork_R = 0.7*(79 - ForkLinePointx_l) / (55 - ForkLinePointy);
 //    for (Ysite = 55; Ysite > ImageStatus.OFFLine; Ysite--) {
@@ -2438,11 +2413,11 @@ int Fork_dowm = 0;         //三叉减速标志  编码器积分退出
 //        }
 //      }
 //      ImageDeal[Ysite].Center =(ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) / 2;
-//      ImageDeal[Ysite].Wide = ImageDeal[Ysite].RightBorder -ImageDeal[Ysite].LeftBorder;  //宽度更新
+//      ImageDeal[Ysite].Wide = ImageDeal[Ysite].RightBorder -ImageDeal[Ysite].LeftBorder;  //閿熸枻鎷烽敓楗洪潻鎷烽敓鏂ゆ嫹
 //    }
 //  }
 //  if ((ImageStatus.Road_type == Forkin || ImageStatus.Road_type == Forkout) &&
-//         ( yuansanshu == 0))   //第二圈左补线
+//         ( yuansanshu == 0))   //閿熻妭璁规嫹鍦堥敓鏂ゆ嫹閿熸枻鎷�
 //  {
 //    Det_Fork_L = 1.05*ForkLinePointx_r / (55 - ForkLinePointy);
 //    for (Ysite = 55; Ysite > ImageStatus.OFFLine; Ysite--) {
@@ -2461,7 +2436,7 @@ int Fork_dowm = 0;         //三叉减速标志  编码器积分退出
 //        }
 //      }
 //      ImageDeal[Ysite].Center =(ImageDeal[Ysite].RightBorder + ImageDeal[Ysite].LeftBorder) / 2;
-//      ImageDeal[Ysite].Wide = ImageDeal[Ysite].RightBorder -ImageDeal[Ysite].LeftBorder;  //宽度更新
+//      ImageDeal[Ysite].Wide = ImageDeal[Ysite].RightBorder -ImageDeal[Ysite].LeftBorder;  //閿熸枻鎷烽敓楗洪潻鎷烽敓鏂ゆ嫹
 //    }
 //  }
 //}
@@ -2474,16 +2449,16 @@ int Fork_dowm = 0;         //三叉减速标志  编码器积分退出
 //  int yuansanshu;
 //  yuansanshu=SystemData.clrcle_num%2;
 //  if (  (ImageStatus.Road_type == Forkin || ImageStatus.Road_type == Forkout)
-//      &&(yuansanshu == 1))                                           //第一圈右补线
+//      &&(yuansanshu == 1))                                           //閿熸枻鎷蜂竴鍦堥敓鎻鎷烽敓鏂ゆ嫹
 //  {
 //      for (Ysite = 58; Ysite > ImageStatus.OFFLine; Ysite--) {
 //      ImageDeal[Ysite].Center = ImageDeal[Ysite].LeftBorder + buxianwide[Ysite]*0.5;}
-//      //ImageDeal[Ysite].Wide = ImageDeal[Ysite].RightBorder -ImageDeal[Ysite].LeftBorder;  //宽度更新
+//      //ImageDeal[Ysite].Wide = ImageDeal[Ysite].RightBorder -ImageDeal[Ysite].LeftBorder;  //閿熸枻鎷烽敓楗洪潻鎷烽敓鏂ゆ嫹
 //   //   Fit1(59,50);
 //    }
 //
 //  if ((ImageStatus.Road_type == Forkin || ImageStatus.Road_type == Forkout) &&
-//         ( yuansanshu == 0))   //第二圈左补线
+//         ( yuansanshu == 0))   //閿熻妭璁规嫹鍦堥敓鏂ゆ嫹閿熸枻鎷�
 //  {
 //      for (Ysite = 58; Ysite > ImageStatus.OFFLine; Ysite--) {
 //      ImageDeal[Ysite].Center = ImageDeal[Ysite].RightBorder - buxianwide[Ysite]*0.5;}
@@ -2500,15 +2475,15 @@ int ramp_flag = 1;
 void Barn_test_in() {
   uint8 j = 0;
 
-  for (Ysite = 30; Ysite < 55; Ysite++) {    // 由于负压之后速度环需要调硬，所以斑马线的扫描为30到55 防止过硬的速度环导致小车直接刹车，没有过斑马线
+  for (Ysite = 30; Ysite < 55; Ysite++) {    // 閿熸枻鎷烽敓鑺傞潻鎷峰帇涔嬮敓鏂ゆ嫹閿熷姭搴︿紮鎷烽敓鏂ゆ嫹瑕侀敓鏂ゆ嫹纭敓鏂ゆ嫹閿熸枻鎷烽敓鐨嗗府鎷烽敓鏂ゆ嫹閿熺纰夋嫹鎵敓鏂ゆ嫹涓�30閿熸枻鎷�55 閿熸枻鎷锋閿熸枻鎷风‖閿熸枻鎷烽敓鍔害浼欐嫹閿熸枻鎷烽敓鏂ゆ嫹灏忛敓鏂ゆ嫹鐩撮敓鏂ゆ嫹鍒归敓鏂ゆ嫹閿熸枻鎷锋病閿熷彨鐧告嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
     j = 0;
     for (Xsite = ImageDeal[Ysite].LeftBorder; Xsite < ImageDeal[Ysite].RightBorder; Xsite++) {
-      if (Pixle[Ysite][Xsite] != Pixle[Ysite][Xsite + 1])  //检测到有黑白跳变点
+      if (Pixle[Ysite][Xsite] != Pixle[Ysite][Xsite + 1])  //閿熸枻鎷风嵕鏂ゆ嫹娉昏瘞閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
         j++;
     }
     if (j > 10 /*&&rampnum==2*/) {
       ImageStatus.Road_type = Barn_in;
-  //    ramp_flag = 1;                                       //检测到库就把这个标志位置1
+  //    ramp_flag = 1;                                       //閿熸枻鎷风嵕鏂ゆ嫹閿熼叺甯嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻鐤氫紮鎷烽敓锟�1
  //     rampnum=0;
    //   barnlenth=SystemData.SpeedData.Length;
      // SystemData.clrcle_num = 0;
@@ -2521,7 +2496,7 @@ void Barn_test_in() {
   if (  ImageStatus.Road_type == Barn_in
 //      &&ImageStatus.Barn_Lenth * OX > 100
        && ImageStatus.Barn_Lenth >2000
-      &&ImageStatus.Barn_Flag == 0)                         //第一次检测到车库  将标志位置为1
+      &&ImageStatus.Barn_Flag == 0)                         //閿熸枻鎷蜂竴閿熻娇纭锋嫹鐛炬枻鎷烽敓鏂ゆ嫹閿燂拷  閿熸枻鎷烽敓鏂ゆ嫹蹇椾綅閿熸枻鎷蜂负1
   {
       SystemData.Stop = 1;
       pwm_set_duty(ATOM1_CH4_P02_4,2000);
@@ -2533,7 +2508,7 @@ void Barn_test_in() {
 }
 //
 //
-////入库补线  最后没用
+////閿熸枻鎷风崰鐧告嫹閿燂拷  閿熸枻鎷烽敓鐭紮鎷烽敓锟�
 //static int Yjump4 = 0;
 //void Barn_in_Handle(void) {
 //  if (ImageStatus.Barn_Flag == 2) {
@@ -2560,7 +2535,7 @@ void Barn_test_in() {
 //  }
 //}
 //
-////出库补线  最后没用
+////閿熸枻鎷烽敓瑙ｈˉ閿熸枻鎷�  閿熸枻鎷烽敓鐭紮鎷烽敓锟�
 //void Barn_out_Handle(void) {
 //  if (ImageStatus.Road_type == Barn_out) {
 //    for (Ysite = 59; Ysite > ImageStatus.OFFLine; Ysite--) {
@@ -2578,7 +2553,7 @@ void Barn_test_in() {
 
 //--------------------------------------------------------------
 //  @name           straight_speed()
-//  @brief          直线加速处理
+//  @brief          鐩撮敓绔》鎷烽敓鍔揪鎷烽敓鏂ゆ嫹
 //  @parameter      void
 //  @time
 //  @Author         MRCHEN
@@ -2587,7 +2562,7 @@ uint16 Speed_Goal_max=190;
 uint16 Speed_Goal_min=170;
 void straight_speed(void)
 {
-    if(ImageStatus.straight_acc == 1)               //直道
+    if(ImageStatus.straight_acc == 1)               //鐩撮敓鏂ゆ嫹
         Speed_Goal = Speed_Goal_max;
     if(ImageStatus.straight_acc == 0)
         Speed_Goal = Speed_Goal_min;
@@ -2595,8 +2570,8 @@ void straight_speed(void)
         Speed_Goal = Speed_Goal_min;
 }
 
-//用于加速的直道检测
-float variance, variance_acc;  //方差
+//閿熸枻鎷烽敓鑺傜》鎷烽敓鍔鎷风洿閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+float variance, variance_acc;  //閿熸枻鎷烽敓鏂ゆ嫹
 void Straightacc_Test(void)
 {
     int sum = 0;
@@ -2606,17 +2581,17 @@ void Straightacc_Test(void)
     }
     variance_acc = (float)sum / (54 - ImageStatus.OFFLine);
     length_max = len_maxget();
-    if(length_max > 52  //  最长白列，通过判断赛道最大的宽度是否满足规定的区间 来判断是否为直道
-    && ImageStatus.OFFLine <= 15 // 直道的前瞻一定很小
-    && ImageStatus.Left_Line < 2  // 直道不允许有左丢边的情况
-    && ImageStatus.Right_Line < 2 //  && ImageStatus.Road_type == 0// 直道不允许有右丢边的情况
+    if(length_max > 52  //  閿熺瓔闀块敓鏂ゆ嫹閿熷彨锝忔嫹閫氶敓鏂ゆ嫹閿熷彨璁规嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓渚ュ尅鎷烽敓鏂ゆ嫹閿熻鍑ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹濞戭煉鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟� 閿熸枻鎷烽敓鍙鎷烽敓瑙掑嚖鎷蜂负鐩撮敓鏂ゆ嫹
+    && ImageStatus.OFFLine <= 15 // 鐩撮敓鏂ゆ嫹閿熸枻鎷峰墠鐬讳竴閿熸枻鎷烽敓鏂ゆ嫹灏�
+    && ImageStatus.Left_Line < 2  // 鐩撮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻涓㈣竟纰夋嫹閿熸枻鎷烽敓锟�
+    && ImageStatus.Right_Line < 2 //  && ImageStatus.Road_type == 0// 鐩撮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸彮璁规嫹閿熺纰夋嫹閿熸枻鎷烽敓锟�
     && abs((ImageStatus.Det_True-39)) <6)
         ImageStatus.straight_acc = 1;
     else
         ImageStatus.straight_acc = 0;
 }
 
-//计算一列的白列长度
+//閿熸枻鎷烽敓鏂ゆ嫹涓€閿熷彨鐨勫府鎷烽敓鍙鎷烽敓鏂ゆ嫹
 uint8 len(uint8 x)
 {
     unsigned char line,y;
@@ -2632,7 +2607,7 @@ uint8 len(uint8 x)
     }
     return y;
 }
-//计算20~60列之间的最长白列长度
+//閿熸枻鎷烽敓鏂ゆ嫹20~60閿熸枻鎷蜂箣閿熸枻鎷烽敓鏂ゆ嫹鐣涖倧鎷烽敓鏂ゆ嫹璋愰敓鏂ゆ嫹閿燂拷
 uint8 len_maxget(void)
 {
     uint8 x,y,max=0;
@@ -2654,18 +2629,15 @@ void Cross_Test2(){
     int rightlowlen=0;
     int rightmiddlen=0;
     int righthighlen=0;
-        /* 找左边十字特征
-         * 160×120: 起始行54→108（54/60×120），斜率参考偏移行5→10，
-         * 像素跳变判定阈值2→4（像素列数×2） */
-    for (Ysite = 108; Ysite > ImageStatus.OFFLine+2; Ysite--) {
+        //閿熸枻鎷烽敓鏂ゆ嫹閿熺粸顕嗘嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+    for (Ysite = 54; Ysite > ImageStatus.OFFLine+2; Ysite--) {
 
-        //十字底边的有边
+        //鍗侀敓琛楀簳杈圭鎷烽敓鍙唻鎷�
         if(ImageDeal[Ysite].IsLeftFind=='T'&&ImageDeal[Ysite-1].IsLeftFind=='T'&&leftlowlen==0){
             while(ImageDeal[Ysite].IsLeftFind=='T'){
                 leftlowlen++;
                 Ysite--;
-                /* 10行内左边界向内收缩超过4像素，认为是弯道而非十字底边，重置计数 */
-                if(ImageDeal[Ysite].LeftBorder<ImageDeal[Ysite+10].LeftBorder-4){
+                if(ImageDeal[Ysite].LeftBorder<ImageDeal[Ysite+5].LeftBorder-2){
                     leftlowlen=1;
                     break;
                 }
@@ -2673,7 +2645,7 @@ void Cross_Test2(){
             }
         }
 
-        //十字中间的丢边
+        //鍗侀敓鏂ゆ嫹閿熷彨纭锋嫹浜╅敓鏂ゆ嫹閿燂拷
         if(ImageDeal[Ysite].IsLeftFind=='W'&&ImageDeal[Ysite-1].IsLeftFind=='W'&&leftmiddlen==0){
             while(ImageDeal[Ysite].IsLeftFind=='W'){
                 leftmiddlen++;
@@ -2681,7 +2653,7 @@ void Cross_Test2(){
             }
         }
 
-        //十字上边的有边
+        //鍗侀敓鏂ゆ嫹閿熻緝杈圭鎷烽敓鍙唻鎷�
         if(ImageDeal[Ysite].IsRightFind=='T'&&ImageDeal[Ysite-1].IsRightFind=='T'&&lefthighlen==0){
             while(ImageDeal[Ysite].IsRightFind=='T'){
                 lefthighlen++;
@@ -2689,22 +2661,21 @@ void Cross_Test2(){
             }
         }
     }
-        /* 找右边十字特征，同理 */
-    for (Ysite = 108; Ysite > ImageStatus.OFFLine+2; Ysite--) {
-        //十字底边的有边
+        //閿熸枻鎷烽敓鎻唻鎷峰崄閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+    for (Ysite = 54; Ysite > ImageStatus.OFFLine+2; Ysite--) {
+        //鍗侀敓琛楀簳杈圭鎷烽敓鍙唻鎷�
         if(ImageDeal[Ysite].IsRightFind=='T'&&ImageDeal[Ysite-1].IsRightFind=='T'&&rightlowlen==0){
             while(ImageDeal[Ysite].IsRightFind=='T'){
                 rightlowlen++;
                 Ysite--;
-                /* 10行内右边界向内收缩超过4像素，认为是弯道而非十字底边，重置计数 */
-                if(ImageDeal[Ysite].RightBorder>ImageDeal[Ysite+10].RightBorder+4){
+                if(ImageDeal[Ysite].RightBorder>ImageDeal[Ysite+5].RightBorder+2){
                     rightlowlen=1;
                     break;
                 }
             }
         }
 
-        //十字底边的丢边
+        //鍗侀敓琛楀簳杈圭殑璁规嫹閿熸枻鎷�
         if(ImageDeal[Ysite].IsRightFind=='W'&&ImageDeal[Ysite-1].IsRightFind=='W'&&rightmiddlen==0){
             while(ImageDeal[Ysite].IsRightFind=='W'){
                 rightmiddlen++;
@@ -2712,7 +2683,7 @@ void Cross_Test2(){
             }
         }
 
-        //十字上边的有边
+        //鍗侀敓鏂ゆ嫹閿熻緝杈圭鎷烽敓鍙唻鎷�
         if(ImageDeal[Ysite].IsRightFind=='T'&&ImageDeal[Ysite-1].IsRightFind=='T'&&righthighlen==0){
             while(ImageDeal[Ysite].IsRightFind=='T'){
                 righthighlen++;
@@ -2720,13 +2691,11 @@ void Cross_Test2(){
             }
         }
     }
-    /* 160×120: 各段最小行数阈值×2（底部>10行、中部>10行、上部>8行）
-     * 同时满足左右两侧三段特征才确认为十字路口 */
-    if(     leftlowlen > 10 &&leftmiddlen > 10
-          &&lefthighlen>8
-          &&rightlowlen>10
-          &&rightmiddlen>10
-          &&righthighlen>8
+    if(     leftlowlen > 5 &&leftmiddlen > 5
+          &&lefthighlen>4
+          &&rightlowlen>5
+          &&rightmiddlen>5
+          &&righthighlen>4
           )
         ImageStatus.Road_type=Cross_ture;
 
@@ -2742,33 +2711,30 @@ void Pcir_Handle() {
  // float Det_Fork_L;
   //float Det_Fork_R;
 
-//  if (  (ImageStatus.Road_type == Forkin || ImageStatus.Road_type == Forkout))                                           //第一圈右补线
+//  if (  (ImageStatus.Road_type == Forkin || ImageStatus.Road_type == Forkout))                                           //閿熸枻鎷蜂竴鍦堥敓鎻鎷烽敓鏂ゆ嫹
 //  {
 //      for (Ysite = 58; Ysite > ImageStatus.OFFLine; Ysite--) {
 //      ImageDeal[Ysite].Center = ImageDeal[Ysite].LeftBorder + buxianwide[Ysite]*0.5;}
-//      //ImageDeal[Ysite].Wide = ImageDeal[Ysite].RightBorder -ImageDeal[Ysite].LeftBorder;  //宽度更新
+//      //ImageDeal[Ysite].Wide = ImageDeal[Ysite].RightBorder -ImageDeal[Ysite].LeftBorder;  //閿熸枻鎷烽敓楗洪潻鎷烽敓鏂ゆ嫹
 //   //   Fit1(59,50);
 //    }
 
-  if (ImageStatus.Road_type==Cross_ture)   //第二圈左补线
+  if (ImageStatus.Road_type==Cross_ture)   //閿熻妭璁规嫹鍦堥敓鏂ゆ嫹閿熸枻鎷�
   {
-      /* 160×120: 起始行58→116（接近图像底部），
-       * buxianwide已扩展为120项且值×2，与列数匹配；
-       * Fit1参数：起始行118（原59×2），平滑行数100（原50×2） */
-      for (Ysite = 116; Ysite > ImageStatus.OFFLine; Ysite--)
+      for (Ysite = 58; Ysite > ImageStatus.OFFLine; Ysite--)
       {
       ImageDeal[Ysite].Center = ImageDeal[Ysite].RightBorder - buxianwide[Ysite]*0.5;
       ImageDeal[Ysite].LeftBorder=ImageDeal[Ysite].RightBorder - buxianwide[Ysite];
       }
-      Fit1(118,100);
+      Fit1(59,50);
    }
 
 }
 
 
-/****元素检测*****/  //圆环 十字 车库 需要通过编码器积分自己跳出元素标志  而三叉只在一瞬间
-                     //所以没检测到特征就直接此处跳出
-uint8 Var_speed_start=0;//缓冲起步相关
+/****鍏冮敓鎴》鎷烽敓锟�*****/  //鍦嗛敓鏂ゆ嫹 鍗侀敓鏂ゆ嫹 閿熸枻鎷烽敓鏂ゆ嫹 閿熸枻鎷疯閫氶敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鐨嗙》鎷烽敓鏂ゆ嫹閿熸枻鎷峰厓閿熸埅鎲嬫嫹蹇�  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰彧閿熸枻鎷蜂竴鐬敓鏂ゆ嫹
+                     //閿熸枻鎷烽敓鏂ゆ嫹娌￠敓鏂ゆ嫹鐛炬枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓琛楁唻鎷峰摕鑸滈敓鏂ゆ嫹閿熸枻鎷烽敓锟�
+uint8 Var_speed_start=0;//閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
 uint8_t YH_flag=0;
 void Element_Test(void)
 {
@@ -2780,23 +2746,23 @@ void Element_Test(void)
     }
     if(Var_speed_start==1)
     {
-        straight_speed();//速度处理
+        straight_speed();//閿熷姭搴﹁揪鎷烽敓鏂ゆ嫹
     }
-    //圆环检测
+    //鍦嗛敓鏂ゆ嫹閿熸枻鎷烽敓锟�
 //    if(ImageStatus.straight_acc == 0)//&& huan_start == 1)
 //    {
         if(YH_flag == 0)
         {
-            Element_Judgment_Left_Rings();           //左圆环检测
-            Element_Judgment_Right_Rings();          //右圆环检测
+            Element_Judgment_Left_Rings();           //閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+            Element_Judgment_Right_Rings();          //閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
         }
         else if(YH_flag == 1)
         {
-            Element_Judgment_Left_Rings();           //左圆环检测
+            Element_Judgment_Left_Rings();           //閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
         }
         else if(YH_flag == 2)
         {
-            Element_Judgment_Right_Rings();          //右圆环检测
+            Element_Judgment_Right_Rings();          //閿熸枻鎷峰渾閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
         }
 //    }
 }
@@ -2812,12 +2778,12 @@ void Element_Handle(void)
 uint8 all_stop_car[] = "9";
 //extern int Sanchacha;
 //extern int rukubz;
-/****出界处理********/
+/****閿熸枻鎷烽敓鐣屽閿熸枻鎷�********/
 void Stop_Test(void)
 {
     if(ImageStatus.Road_type == LeftCirque || ImageStatus.Road_type == RightCirque)
         return;
-    if(ImageStatus.OFFLine >= 55)           //如果电磁很小并且可视距离基本没有就表示出界
+    if(ImageStatus.OFFLine >= 55)           //閿熸枻鎷烽敓鏂ゆ嫹閿熻剼鐚存嫹灏忛敓鏂ゆ嫹閿熸彮鍖℃嫹閿熸帴鎾呮嫹閿熸枻鎷烽敓鏂ゆ嫹閿熺煫浼欐嫹鑺崊閿熺粸鎾呮嫹閿熸枻鎷烽敓锟�
         SystemData.Stop = 1;
 }
 
@@ -2840,24 +2806,24 @@ void Stop_Test3()
 
 }
 
-void DrawLine()  //画边界  好调试
+void DrawLine()  //閿熸枻鎷烽敓绔枻鎷�  閿熺煫纰夋嫹閿熸枻鎷�
 {
   uint8 i;
   for (i = 59; i > ImageStatus.OFFLine; i--) {
-    Pixle[i][ImageDeal[i].LeftBorder + 2] = 0;  //移动两位便于观察
+    Pixle[i][ImageDeal[i].LeftBorder + 2] = 0;  //閿熺嫛璁规嫹閿熸枻鎷蜂綅閿熸枻鎷烽敓鑺傝璇ф嫹
     Pixle[i][ImageDeal[i].RightBorder - 2] = 0;
     Pixle[i][ImageDeal[i].Center] = 0;
   }
 }
 
-/*****************误差按权重重新整定**********************/
+/*****************閿熸枻鎷风晭鎱堫煉鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓锟�**********************/
 void GetDet() {
   float DetTemp = 0;
   int TowPoint = 0;
   float SpeedGain = 0;
   float UnitAll = 0;
 
-  SpeedGain=(SystemData.SpeedData.nowspeed - SystemData.SpeedData.MinSpeed) * 0.2 +0.5 ;//根据速度调整前瞻的因子   速度高于80  增益为负数  前瞻加长
+  SpeedGain=(SystemData.SpeedData.nowspeed - SystemData.SpeedData.MinSpeed) * 0.2 +0.5 ;//閿熸枻鎷烽敓鏂ゆ嫹閿熷姭搴︾鎷烽敓鏂ゆ嫹鍓嶇灮閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�   閿熷姭搴﹂潻鎷烽敓鏂ゆ嫹80  閿熸枻鎷烽敓鏂ゆ嫹涓洪敓鏂ゆ嫹閿熸枻鎷�  鍓嶇灮閿熸帴绛规嫹
 
     if (SpeedGain >= 3)
       SpeedGain = 3;
@@ -2865,21 +2831,21 @@ void GetDet() {
       SpeedGain = -1;
 
 //    if ((ImageStatus.Road_type == RightCirque ||ImageStatus.Road_type == LeftCirque)&&ImageStatus.CirqueOff == 'F')
-//    TowPoint = 23;                                                                      //圆环前瞻
+//    TowPoint = 23;                                                                      //鍦嗛敓鏂ゆ嫹鍓嶇灮
 
     else if (ImageStatus.Road_type == Straight)
     TowPoint = SystemData.straighet_towpoint;
 
-    else if(ImageStatus.Road_type ==Cross_ture)
-    {
-        TowPoint=44;  /* 160×120: 前瞻行 22→44（行数×2，保持相同的物理前视距离） */
-    }
-    else if(ImageStatus.Road_type == LeftCirque || ImageStatus.Road_type == RightCirque)
-    {
-        TowPoint=44;  /* 160×120: 同上 */
-    }
-    else
-    TowPoint = ImageStatus.TowPoint-SpeedGain;                                          //速度越快前瞻越长
+  else if(ImageStatus.Road_type ==Cross_ture)
+  {
+      TowPoint=22;
+  }
+  else if(ImageStatus.Road_type == LeftCirque || ImageStatus.Road_type == RightCirque)
+  {
+      TowPoint=22;
+  }
+else
+    TowPoint = ImageStatus.TowPoint-SpeedGain;                                          //閿熷姭璁规嫹瓒婇敓鏂ゆ嫹鍓嶇灮瓒婇敓鏂ゆ嫹
 
   if (TowPoint < ImageStatus.OFFLine)
     TowPoint = ImageStatus.OFFLine + 1;
@@ -2887,7 +2853,7 @@ void GetDet() {
   if (TowPoint >= 49)
     TowPoint = 49;
 
-  if ((TowPoint - 5) >= ImageStatus.OFFLine) {                                          //前瞻取设定前瞻还是可视距离  需要分情况讨论
+  if ((TowPoint - 5) >= ImageStatus.OFFLine) {                                          //鍓嶇灮鍙栭敓鍊熷畾鍓嶇灮閿熸枻鎷烽敓瑙掑尅鎷烽敓鎺ユ拝鎷烽敓鏂ゆ嫹  閿熸枻鎷疯閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
     for (int Ysite = (TowPoint - 5); Ysite < TowPoint; Ysite++) {
       DetTemp = DetTemp + Weighting[TowPoint - Ysite - 1] * (ImageDeal[Ysite].Center);
       UnitAll = UnitAll + Weighting[TowPoint - Ysite - 1];
@@ -2918,25 +2884,25 @@ void GetDet() {
     DetTemp = (ImageDeal[ImageStatus.OFFLine].Center + DetTemp) / (UnitAll + 1);
 
   } else
-    DetTemp =ImageStatus.Det_True;                                                     //如果是出现OFFLine>50情况，保持上一次的偏差值
+    DetTemp =ImageStatus.Det_True;                                                     //閿熸枻鎷烽敓鏂ゆ嫹娴呴敓鏂ゆ嫹閿熺祮FFLine>50閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鎻紮鎷疯敋閿熺嫛顐嫹閿熻锟�
 
-  ImageStatus.Det_True = DetTemp;                                                      //此时的解算出来的平均图像偏差
+  ImageStatus.Det_True = DetTemp;                                                      //閿熸枻鎷锋椂閿熶茎鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鐙℃枻鎷烽敓閰电》鎷烽敓鐙☆偓鎷烽敓锟�
 //  if()
-  ImageStatus.TowPoint_True = TowPoint;                                                //此时的前瞻
+  ImageStatus.TowPoint_True = TowPoint;                                                //閿熸枻鎷锋椂閿熸枻鎷峰墠鐬�
 }
 
 
 //--------------------------------------------------------------
-//  @name           斑马线判断
+//  @name           閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鍙鎷�
 //  @brief
 //  @parameter      void
 //-------------------------------------------------------------
-int Zebras;   //斑马线积分
-int Zebras_;    //堵转积分
+int Zebras;   //閿熸枻鎷烽敓鏂ゆ嫹閿熺浼欐嫹閿熸枻鎷�
+int Zebras_;    //閿熸枻鎷疯浆閿熸枻鎷烽敓鏂ゆ嫹
 uint8  banmaxian_on=0;
 void Element_Judgment_Zebra()//
 {
-    if( ImageStatus.Road_type == LeftCirque  //防止出环标志位没加导致一直占用标志位
+    if( ImageStatus.Road_type == LeftCirque  //閿熸枻鎷锋閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰織浣嶆病閿熸帴纰夋嫹閿熸枻鎷蜂竴鐩村崰閿熺煫鎲嬫嫹蹇椾綅
       ||ImageStatus.Road_type == RightCirque
       ||banmaxian_on == 1) return;
 
@@ -2969,8 +2935,8 @@ int sanchachazhi;
 float Det = 0;
 extern int cpu1_get_err;
 void ImageProcess(void) {
-    compressimage();          //图像压缩 0.6ms
-    ImageStatus.OFFLine = 2;  //这个值根据真实距离得到，必须进行限制
+    compressimage();          //鍥鹃敓鏂ゆ嫹鍘嬮敓鏂ゆ嫹 0.6ms
+    ImageStatus.OFFLine = 2;  //閿熸枻鎷烽敓琛楃鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓缁炵鎷烽敓鏂ゆ嫹閿熺煫纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
     ImageStatus.WhiteLine = 0;
   for (Ysite = 59; Ysite >= ImageStatus.OFFLine; Ysite--) {
     ImageDeal[Ysite].IsLeftFind = 'F';
@@ -2989,43 +2955,43 @@ void ImageProcess(void) {
 //    ImageDeal[Ysite].opp_LeftBorder = 0;
 //    ImageDeal[Ysite].opp_RightBorder = 0;
 
-  }                     //边界与标志位初始化
+  }                     //閿熺鏂ゆ嫹閿熸枻鎷烽敓琛楃枤浼欐嫹閿熺粸纭锋嫹閿燂拷
 
  // K = Fit1_k(59-ImageStatus.OFFLine+10,10);
 
-  Get01change_dajin();  //图像二值化    2.7ms
+  Get01change_dajin();  //鍥鹃敓鏂ゆ嫹閿熻纰夋嫹閿燂拷    2.7ms
   //tft180_show_string(0,90,"che");
   //if(SystemData.clrcle_num!=2)
-  Pixle_Filter();     //腐蚀         1.7ms}
+  Pixle_Filter();     //閿熸枻鎷疯殌         1.7ms}
 
-  DrawLinesFirst();     //绘制底边      30us
-  DrawLinesProcess();   //得到基本边线  8us
-  Search_Border_OTSU(Pixle, LCDH, LCDW, LCDH - 2);//58行位底行
+  DrawLinesFirst();     //閿熸枻鎷烽敓鐙″簳鎲嬫嫹      30us
+  DrawLinesProcess();   //閿熺煫纰夋嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹  8us
+  Search_Border_OTSU(Pixle, LCDH, LCDW, LCDH - 2);//58閿熸枻鎷蜂綅閿熸枻鎷烽敓鏂ゆ嫹
 
-  /***元素识别*****/
+  /***鍏冮敓鏂ゆ嫹璇嗛敓鏂ゆ嫹*****/
   Element_Test();                   //5us
-  /***元素识别*****/
+  /***鍏冮敓鏂ゆ嫹璇嗛敓鏂ゆ嫹*****/
   DrawExtensionLine();
-  RouteFilter();        //中线滤波平滑 2us
+  RouteFilter();        //閿熸枻鎷烽敓鏂ゆ嫹閿熷壙璇ф嫹骞抽敓鏂ゆ嫹 2us
 
-  //斑马线
-  if(Zebras<320)    //斑马线判断延时
+  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+  if(Zebras<320)    //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鍙鎷烽敓鏂ゆ嫹鏃�
       Zebras++;
       if(Zebras>300)
           if(ImageStatus.Road_type != LeftCirque
            &&ImageStatus.Road_type != RightCirque)
-              Element_Judgment_Zebra();  //斑马线判断
+              Element_Judgment_Zebra();  //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鍙鎷�
 
-  /***元素处理*****/
+  /***鍏冮敓鎴揪鎷烽敓鏂ゆ嫹*****/
   Element_Handle();  // 3us
-  /***元素处理*****/
-  Stop_Test();           //出界保护   有两个  这个保护力度大
-  GetDet();               //获取动态前瞻  并且计算图像偏差 3us
+  /***鍏冮敓鎴揪鎷烽敓鏂ゆ嫹*****/
+  Stop_Test();           //閿熸枻鎷烽敓鐣屼繚閿熸枻鎷�   閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�  閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷峰嵈閿燂拷
+  GetDet();               //閿熸枻鎷峰彇閿熸枻鎷锋€佸墠鐬�  閿熸枻鎷烽敓鎻》鎷烽敓鏂ゆ嫹鍥鹃敓鏂ゆ嫹鍋忛敓鏂ゆ嫹 3us
 
   //cpu1_get_err == 1;
      // Menu_key_set();
 
-  //Stop_Test3();//2024年3月7日03:07:31
+  //Stop_Test3();//2024閿熸枻鎷�3閿熸枻鎷�7閿熸枻鎷�03:07:31
 
 //  ImageStatus.Foresight = ((((ImageDeal[ImageStatus.OFFLine + 1].Center) +
 //                             (ImageDeal[ImageStatus.OFFLine + 2].Center) +

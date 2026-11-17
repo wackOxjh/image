@@ -16,10 +16,10 @@ static int IntervalLow = 0, IntervalHigh = 0;      //定义高低扫描区间
 static int ytemp = 0;                              //存放行
 static int TFSite = 0, FTSite = 0;                 //存放行
 static float DetR = 0, DetL = 0;                   //存放斜率
-static int BottomBorderRight = 79,                 //59行右边界
+static int BottomBorderRight = (LCDW - 1),         //底行右边界
 BottomBorderLeft = 0,                              //59行左边界
 BottomCenter = 0;                                  //59行中点
-ImageDealDatatypedef ImageDeal[60];                //记录单行的信息
+ImageDealDatatypedef ImageDeal[LCDH];              //记录单行的信息
 ImageStatustypedef ImageStatus;                    //图像的全局变量
 ImageStatustypedef ImageData;             ///////需要修改的图像阈值参数
 SystemDatatypdef SystemData;
@@ -44,7 +44,7 @@ int aycircle=0;
 int bxcircle=0;
 int bycircle=0;
 float K;
-uint8 Half_Road_Wide[60] =                      //直到赛道半宽
+uint8 Half_Road_Wide[LCDH] =                      //直到赛道半宽
 {  1, 1, 1, 1, 2, 2, 3, 3, 4, 4,
         5, 5,6,6,7,8,8,9,9,10,
        11,11,11,12,13,13,14,15,15,16,
@@ -53,7 +53,7 @@ uint8 Half_Road_Wide[60] =                      //直到赛道半宽
        28,28,29,30,30,30,31,32,32,33,
 };
 
-uint8 Half_Bend_Wide[60] =                      //弯道赛道半宽
+uint8 Half_Bend_Wide[LCDH] =                      //弯道赛道半宽
 {   33,33,33,33,33,33,33,33,33,33,
     33,33,32,32,30,30,29,29,28,27,
     28,27,27,26,26,25,25,24,24,23,
@@ -63,7 +63,7 @@ uint8 Half_Bend_Wide[60] =                      //弯道赛道半宽
 };
 
 
-uint8 buxianwide[60]={6,7,8,9,10,11,12,13,14,15,
+uint8 buxianwide[LCDH]={6,7,8,9,10,11,12,13,14,15,
                       16,17,18,19,20,21,22,23,24,25,
                       26,27,28,29,30,31,32,33,34,35,
                       36,37,38,39,40,41,42,43,44,45,
